@@ -92,7 +92,7 @@ if (!rides.length) {
     if (event.target.matches(".inline-btn")) {
       event.stopPropagation();
       const email = event.target.dataset.email;
-      window.location.href = `mailto:${email}?subject=Pedido%20de%20boleia%20UniRide`;
+      alert(`Contacta o condutor em: ${email}`);;
     }
   });
 

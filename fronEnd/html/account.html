@@ -4,14 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UniRide | Conta</title>
-
   <link rel="stylesheet" href="../css/styles.css" />
 </head>
-
 <body>
-
   <main class="app-shell">
-
     <header class="topbar">
       <div>
         <h1>A minha conta</h1>
@@ -19,62 +15,74 @@
       </div>
 
       <div class="topbar-actions">
-        <a href="rides.html">
-          <button class="secondary-btn">Boleias</button>
-        </a>
-
         <a href="dashboard.html">
           <button class="secondary-btn">Dashboard</button>
+        </a>
+        <a href="rides.html">
+          <button class="secondary-btn">Boleias</button>
         </a>
       </div>
     </header>
 
-    <section class="dashboard-grid">
+    <section class="dashboard-grid account-grid">
+      <div class="card account-main-card">
+        <h2 class="page-title">Resumo da conta</h2>
 
-      <!-- BOLEIAS ATIVAS -->
-      <div class="card">
-        <h2 class="page-title">Boleias abertas</h2>
+        <div class="stats">
+          <div class="stat">
+            <strong id="totalRides">0</strong>
+            <span>Boleias criadas</span>
+          </div>
 
-        <div id="activeRides">
-          <div class="empty-state">
-            Ainda não tens boleias ativas.
+          <div class="stat">
+            <strong id="totalSeats">0</strong>
+            <span>Lugares disponíveis</span>
+          </div>
+
+          <div class="stat">
+            <strong id="co2Saved">0 kg</strong>
+            <span>CO₂ estimado poupado</span>
+          </div>
+        </div>
+
+        <div class="account-user-block">
+          <h3 class="section-subtitle">Dados pessoais</h3>
+
+          <div class="user-info-grid" id="userInfo">
+            <div class="info-item">
+              <span class="info-label">Nome</span>
+              <strong id="userName">—</strong>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">Email</span>
+              <strong id="userEmail">—</strong>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">ID de utilizador</span>
+              <strong id="userId">—</strong>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- HISTÓRICO -->
+      <div class="card">
+        <h2 class="page-title">Boleias guardadas</h2>
+        <div id="activeRides">
+          <div class="empty-state">Ainda não tens boleias guardadas.</div>
+        </div>
+      </div>
+
       <div class="card">
         <h2 class="page-title">Histórico de boleias</h2>
-
         <div id="rideHistory">
-          <div class="empty-state">
-            Ainda não tens histórico de boleias.
-          </div>
+          <div class="empty-state">Ainda não tens histórico de boleias.</div>
         </div>
       </div>
-
     </section>
-
-
-    <!-- DADOS PESSOAIS -->
-    <section class="card" style="margin-top:20px;">
-      <h2 class="page-title">Dados pessoais</h2>
-
-      <div id="userInfo">
-
-        <p><strong>Nome:</strong> <span id="userName">—</span></p>
-
-        <p><strong>Email:</strong> <span id="userEmail">—</span></p>
-
-      
-
-      </div>
-
-    </section>
-
   </main>
 
   <script src="../js/account.js"></script>
-
 </body>
 </html>

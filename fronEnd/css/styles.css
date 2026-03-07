@@ -433,4 +433,60 @@ input:focus {
   .topbar-actions {
     flex-direction: column;
   }
+
+  .account-grid {
+    align-items: start;
+  }
+
+  .account-main-card {
+    max-width: 100%;
+  }
+
+  .account-user-block {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .section-subtitle {
+    margin: 0 0 16px;
+    font-size: 18px;
+  }
+
+  .user-info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  .info-item {
+    background: #f6faf9;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+  }
+
+  .info-label {
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .info-item strong {
+    font-size: 16px;
+    word-break: break-word;
+  }
+
+  #activeRides,
+  #rideHistory {
+    display: grid;
+    gap: 14px;
+  }
+
+  @media (max-width: 900px) {
+    .user-info-grid {
+      grid-template-columns: 1fr;
+    }
+  }
 }
