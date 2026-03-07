@@ -17,7 +17,7 @@
       <div class="topbar-actions">
         <a href="rides.html"><button class="secondary-btn">Ver boleias</button></a>
         <a href="account.html"><button class="secondary-btn">Conta</button></a>
-        <button id="logoutBtn" class="primary-btn topbar-primary">Logout</button>
+        
       </div>
     </header>
 
@@ -27,19 +27,27 @@
         <div id="rideMessage" class="message hidden"></div>
 
         <form id="rideForm" class="styled-form">
-          <div class="form-grid two-columns align-end">
-            <div>
+          <div class="form-grid vertical-layout">
+            <!-- Linha superior: Data e Hora lado a lado -->
+            <div class="datetime-row">
+              <div class="datetime-item">
+                <label for="date">Data</label>
+                <input type="date" id="date" required />
+              </div>
+              <div class="datetime-item">
+                <label for="time">Hora</label>
+                <input type="time" id="time" required />
+              </div>
+            </div>
+
+            <!-- Linha inferior: Origem -->
+            <div class="origin-row">
               <label for="origin">Origem</label>
               <div class="origin-input-row">
                 <input type="text" id="origin" placeholder="Ex: Corroios ou Rua da Liberdade, Almada" required />
                 <button type="button" id="findOriginBtn" class="secondary-btn map-search-btn">Encontrar no mapa</button>
               </div>
               <p class="helper-text helper-text-tight">Escreve uma zona, rua ou local e carrega em “Encontrar no mapa”.</p>
-            </div>
-
-            <div>
-              <label for="time">Hora de partida</label>
-              <input type="time" id="time" required />
             </div>
           </div>
 

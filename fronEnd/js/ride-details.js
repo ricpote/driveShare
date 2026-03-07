@@ -63,5 +63,73 @@ if (!ride) {
       <span class="info-label">Comentário do condutor</span>
       <p>${ride.comment ? ride.comment : "Sem comentário adicional."}</p>
     </div>
+
+    <div style="margin-top:20px;">
+      <button id="requestRideBtn" class="primary-btn">Pedir boleia</button>
+    </div>
+
+    <div id="rideMap" style="height:300px;margin-top:20px;border-radius:12px;"></div>
   `;
+}
+
+if (ride) {
+
+  const map = L.map("rideMap").setView([ride.startLat, ride.startLng], 12);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "© OpenStreetMap"
+  }).addTo(map);
+
+  L.marker([ride.startLat, ride.startLng]).addTo(map);
+
+  L.polyline(
+    [
+      [ride.startLat, ride.startLng],
+      [38.661, -9.204]
+    ],
+    {
+      color: "#136f63",
+      weight: 4
+    }
+  ).addTo(map);
+
+  let pickupMarker = null;
+
+  map.on("click", (e) => {
+    const { lat, lng } = e.latlng;
+
+    if (pickupMarker) {
+      pickupMarker.setLatLng([lat, lng]);
+    } else {
+      pickupMarker = L.marker([lat, lng]).addTo(map);
+    }
+  });
+
+  const requestBtn = document.getElementById("requestRideBtn");
+
+  requestBtn.addEventListener("click", () => {
+
+    if (!pickupMarker) {
+      alert("Escolhe no mapa onde queres ser apanhado.");
+      return;
+    }
+
+    const { lat, lng } = pickupMarker.getLatLng();
+
+    if (!ride.requests) ride.requests = [];
+
+    ride.requests.push({
+      id: Date.now(),
+      userId: currentUser.id,
+      name: currentUser.name,
+      lat,
+      lng,
+      status: "pending"
+    });
+
+    localStorage.setItem(RIDES_KEY, JSON.stringify(rides));
+
+    alert("Pedido enviado ao condutor.");
+  });
+
 }

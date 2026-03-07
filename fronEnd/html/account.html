@@ -5,9 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UniRide | Conta</title>
   <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 </head>
+
 <body>
-  <main class="app-shell">
+  <main class="app-shell account-page">
+
     <header class="topbar">
       <div>
         <h1>A minha conta</h1>
@@ -21,10 +24,46 @@
         <a href="rides.html">
           <button class="secondary-btn">Boleias</button>
         </a>
+        <button id="logoutBtn" class="primary-btn topbar-primary">Logout</button>
       </div>
     </header>
 
-    <section class="dashboard-grid account-grid">
+    <section class="account-layout">
+
+      <!-- BOLEIAS MARCADAS -->
+      <div class="card rides-active-card">
+        <h2 class="page-title">Boleias marcadas</h2>
+
+        <div id="rideMap"></div>
+
+        <div class="ride-passengers">
+          <h3 class="section-subtitle">Pedidos para entrar na boleia</h3>
+
+          <div id="ridePassengers">
+            <div class="empty-state">
+              Ainda não há pedidos para esta boleia.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTÓRICO -->
+      <div class="card">
+        <div class="history-header">
+          <h2 class="page-title">Histórico de boleias dadas</h2>
+          <button class="secondary-btn small-btn" id="viewAllHistory">
+            Ver todas
+          </button>
+        </div>
+
+        <div id="rideHistory">
+          <div class="empty-state">
+            Ainda não tens histórico de boleias.
+          </div>
+        </div>
+      </div>
+
+      <!-- RESUMO CONTA -->
       <div class="card account-main-card">
         <h2 class="page-title">Resumo da conta</h2>
 
@@ -46,9 +85,12 @@
         </div>
 
         <div class="account-user-block">
-          <h3 class="section-subtitle">Dados pessoais</h3>
+          <h3 class="section-subtitle">Dados pessoais
+            <button id="editUserBtn" class="secondary-btn small-btn">Editar</button>
+          </h3>
+          
 
-          <div class="user-info-grid" id="userInfo">
+          <div class="user-info-grid" id="userInfoGrid">
             <div class="info-item">
               <span class="info-label">Nome</span>
               <strong id="userName">—</strong>
@@ -71,23 +113,10 @@
           </div>
         </div>
       </div>
-
-      <div class="card">
-        <h2 class="page-title">Boleias guardadas</h2>
-        <div id="activeRides">
-          <div class="empty-state">Ainda não tens boleias guardadas.</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2 class="page-title">Histórico de boleias</h2>
-        <div id="rideHistory">
-          <div class="empty-state">Ainda não tens histórico de boleias.</div>
-        </div>
-      </div>
     </section>
   </main>
 
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="../js/account.js"></script>
 </body>
 </html>

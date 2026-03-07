@@ -683,3 +683,114 @@ textarea:focus {
     width: 100%;
   }
 }
+
+.account-layout {
+  display: grid;
+  gap: 24px;
+}
+
+.rides-active-card {
+  padding-bottom: 24px;
+}
+
+#rideMap {
+  height: 320px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+
+.ride-passengers {
+  margin-top: 10px;
+}
+
+.passenger-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  background: #f9fbfb;
+}
+
+.passenger-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.small-btn {
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+.passenger-card{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:12px;
+border:1px solid var(--border);
+border-radius:10px;
+margin-bottom:10px;
+}
+
+.passenger-actions{
+display:flex;
+gap:8px;
+}
+
+.account-page .card {
+  max-width: none;
+  width: 100%;
+}
+
+.account-page .account-layout {
+  width: 100%;
+}
+
+#rideMap {
+  height: 400px;
+  width: 100%;
+  border-radius: 10px;
+  margin-top: 16px;
+}
+
+/* Container vertical: Data/Hora em cima, Origem em baixo */
+.vertical-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Linha com Data e Hora lado a lado */
+.datetime-row {
+  display: flex;
+  gap: 12px;
+}
+
+.datetime-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Origem ocupa toda a largura */
+.origin-row {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Responsivo: mobile empilha Data/Hora */
+@media (max-width: 768px) {
+  .datetime-row {
+    flex-direction: column;
+  }
+}

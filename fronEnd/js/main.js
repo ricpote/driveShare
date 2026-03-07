@@ -319,7 +319,7 @@ if (rideForm) {
     e.preventDefault();
 
     const origin = document.getElementById("origin").value.trim();
-    const time = document.getElementById("time").value;
+    const date = document.getElementById("date").value;
     const seats = Number(document.getElementById("seats").value);
     const comment = document.getElementById("rideComment").value.trim();
     const startLat = Number(document.getElementById("startLat").value);
@@ -348,6 +348,7 @@ if (rideForm) {
       origin: document.getElementById("origin").value.trim(),
       destination: "FCT NOVA",
       comment,
+      date,
       time,
       seats,
       startLat: finalStartLat,
