@@ -1,30 +1,78 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-<meta charset="UTF-8">
-<title>UniRide</title>
-<link rel="stylesheet" href="css/styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UniRide | Login</title>
+  <link rel="stylesheet" href="../css/styles.css" />
 </head>
-
 <body>
+  <div class="page auth-page">
+    <div class="brand-panel">
+      <div class="brand-content">
+        <p class="eyebrow">Sustentabilidade universitária</p>
+        <h1>UniRide</h1>
+        <p class="lead">
+          Liga estudantes da mesma zona para partilharem boleia até à faculdade.
+        </p>
+        <div class="brand-points">
+          <div class="point">🚗 Menos carros por estudante</div>
+          <div class="point">🌍 Menos emissões de CO₂</div>
+          <div class="point">🎓 Acesso só com email universitário</div>
+        </div>
+      </div>
+    </div>
 
-<header>
-<h1>🚗 UniRide</h1>
-<p>Partilha boleias com estudantes da tua universidade 676767676767676767</p>
-</header>
+    <div class="auth-panel">
+      <div class="auth-card">
+        <div class="tabs">
+          <button class="tab active" data-tab="login">Entrar</button>
+          <button class="tab" data-tab="register">Criar conta</button>
+        </div>
 
-<section class="hero">
-<h2>Menos 67. Menos CO₂. Mais estudantes juntos.</h2>
+        <div id="message" class="message hidden"></div>
 
-<div class="buttons">
-<button onclick="login()">Login com email universitário</button>
-<a href="rides.html">
-<button>Ver Boleias</button>
-</a>
-</div>
-</section>
+        <form id="loginForm" class="auth-form active">
+          <h2>Entrar</h2>
+          <label for="loginEmail">Email universitário</label>
+          <input type="email" id="loginEmail" placeholder="teuemail@campus.fct.unl.pt" required />
 
-<script src="js/main.js"></script>
+          <label for="loginPassword">Palavra-passe</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" required />
 
+          <button type="submit" class="primary-btn">Entrar</button>
+        </form>
+
+        <form id="registerForm" class="auth-form">
+          <h2>Criar conta</h2>
+          <label for="registerName">Nome</label>
+          <input type="text" id="registerName" placeholder="Nome completo" required />
+
+          <label for="registerEmail">Email universitário</label>
+          <input type="email" id="registerEmail" placeholder="teuemail@campus.fct.unl.pt" required />
+
+          <label for="registerZone">Zona de partida</label>
+          <input type="text" id="registerZone" placeholder="Ex: Almada" required />
+
+          <label for="registerUniversity">Universidade</label>
+          <input type="text" id="registerUniversity" placeholder="Ex: FCT NOVA" required />
+
+          <label for="registerPassword">Palavra-passe</label>
+          <input type="password" id="registerPassword" placeholder="Mínimo 6 caracteres" required />
+
+          <label for="registerConfirmPassword">Confirmar palavra-passe</label>
+          <input type="password" id="registerConfirmPassword" placeholder="Repete a palavra-passe" required />
+
+          <button type="submit" class="primary-btn">Criar conta</button>
+        </form>
+
+        <p class="helper-text">
+          Os dados ficam guardados localmente no browser para depois ligares ao backend.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/main.js"></script>
 </body>
 </html>

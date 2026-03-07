@@ -1,18 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt">
 <head>
-<meta charset="UTF-8">
-<title>Boleias</title>
-<link rel="stylesheet" href="css/styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UniRide | Boleias</title>
+  <link rel="stylesheet" href="../css/styles.css" />
 </head>
-
 <body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <h1>Boleias disponíveis</h1>
+        <p>Encontra estudantes que vão para a mesma universidade.</p>
+      </div>
+      <div class="topbar-actions">
+        <a href="dashboard.html"><button class="secondary-btn">Dashboard</button></a>
+        <a href="index.html"><button class="primary-btn">Conta</button></a>
+      </div>
+    </header>
 
-<h1>Boleias disponíveis</h1>
+    <section class="card list-card">
+      <div id="ridesContainer"></div>
+    </section>
+  </main>
 
-<div id="ridesContainer"></div>
-
-<script src="js/rides.js"></script>
-
+  <script src="../js/rides.js"></script>
 </body>
 </html>

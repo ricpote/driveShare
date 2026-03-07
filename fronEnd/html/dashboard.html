@@ -1,33 +1,67 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt">
 <head>
-<meta charset="UTF-8">
-<title>Dashboard</title>
-<link rel="stylesheet" href="css/styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UniRide | Dashboard</title>
+  <link rel="stylesheet" href="../css/styles.css" />
 </head>
-
 <body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <h1>Dashboard</h1>
+        <p id="welcomeText">Bem-vindo ao UniRide</p>
+      </div>
+      <div class="topbar-actions">
+        <a href="rides.html"><button class="secondary-btn">Ver boleias</button></a>
+        <button id="logoutBtn" class="primary-btn">Logout</button>
+      </div>
+    </header>
 
-<h1>Dashboard</h1>
+    <section class="dashboard-grid">
+      <div class="card">
+        <h2 class="page-title">Criar boleia</h2>
+        <div id="rideMessage" class="message hidden"></div>
 
-<h2>Criar Boleia</h2>
+        <form id="rideForm" class="styled-form">
+          <label for="origin">Origem</label>
+          <input type="text" id="origin" placeholder="Ex: Almada" required />
 
-<form id="rideForm">
+          <label for="destination">Destino</label>
+          <input type="text" id="destination" value="FCT NOVA" required />
 
-<input type="text" id="origin" placeholder="Origem" required>
-<br>
+          <label for="time">Hora de partida</label>
+          <input type="time" id="time" required />
 
-<input type="time" id="time" required>
-<br>
+          <label for="seats">Lugares disponíveis</label>
+          <input type="number" id="seats" min="1" max="8" placeholder="Ex: 3" required />
 
-<input type="number" id="seats" placeholder="Lugares disponíveis" required>
-<br>
+          <button type="submit" class="primary-btn">Guardar boleia</button>
+        </form>
+      </div>
 
-<button type="submit">Criar Boleia</button>
+      <div class="card">
+        <h2 class="page-title">Impacto estimado</h2>
+        <p>Uma boleia partilhada reduz carros na estrada e ajuda a diminuir emissões.</p>
+        <div class="stats">
+          <div class="stat">
+            <strong id="totalRides">0</strong>
+            <span>Boleias criadas</span>
+          </div>
+          <div class="stat">
+            <strong id="totalSeats">0</strong>
+            <span>Lugares disponíveis</span>
+          </div>
+          <div class="stat">
+            <strong id="co2Saved">0 kg</strong>
+            <span>CO₂ estimado poupado</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 
-</form>
-
-<script src="js/main.js"></script>
-
+  <script src="../js/main.js"></script>
 </body>
 </html>
