@@ -61,8 +61,7 @@ if (registerForm) {
     e.preventDefault();
     const name = document.getElementById("registerName").value.trim();
     const email = document.getElementById("registerEmail").value.trim().toLowerCase();
-    const zone = document.getElementById("registerZone").value.trim();
-    const university = document.getElementById("registerUniversity").value.trim();
+
     const password = document.getElementById("registerPassword").value.trim();
     const confirmPassword = document.getElementById("registerConfirmPassword").value.trim();
 
@@ -93,14 +92,12 @@ if (registerForm) {
       id: Date.now(),
       name,
       email,
-      zone,
-      university,
       password
     };
 
     users.push(newUser);
     saveUsers(users);
-    saveCurrentUser({ id: newUser.id, name, email, zone, university });
+    saveCurrentUser({ id: newUser.id, name, email, });
 
     showMessage("message", "Conta criada com sucesso.", "success");
     setTimeout(() => {
@@ -127,8 +124,7 @@ if (loginForm) {
       id: foundUser.id,
       name: foundUser.name,
       email: foundUser.email,
-      zone: foundUser.zone,
-      university: foundUser.university
+
     });
 
     showMessage("message", "Login efetuado com sucesso.", "success");
@@ -146,7 +142,7 @@ if (rideForm) {
   } else {
     const welcomeText = document.getElementById("welcomeText");
     if (welcomeText) {
-      welcomeText.textContent = `Olá, ${currentUser.name}. Partida habitual: ${currentUser.zone}.`;
+      welcomeText.textContent = `Olá, ${currentUser.name}.`;
     }
     updateDashboardStats();
   }
@@ -155,7 +151,6 @@ if (rideForm) {
     e.preventDefault();
 
     const origin = document.getElementById("origin").value.trim();
-    const destination = document.getElementById("destination").value.trim();
     const time = document.getElementById("time").value;
     const seats = Number(document.getElementById("seats").value);
     const user = getCurrentUser();
@@ -165,9 +160,8 @@ if (rideForm) {
       driverId: user.id,
       driverName: user.name,
       driverEmail: user.email,
-      university: user.university,
       origin,
-      destination,
+      destination: "FCT NOVA",
       time,
       seats
     };
@@ -178,7 +172,7 @@ if (rideForm) {
 
     showMessage("rideMessage", "Boleia guardada com sucesso.", "success");
     rideForm.reset();
-    document.getElementById("destination").value = "FCT NOVA";
+
     updateDashboardStats();
   });
 }

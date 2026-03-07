@@ -11,7 +11,7 @@ if (!rides.length) {
       card.className = "ride-card";
       card.innerHTML = `
         <h3>${ride.origin} → ${ride.destination}</h3>
-        <div class="ride-meta">${ride.driverName} · ${ride.university}</div>
+        <div class="ride-meta">${ride.driverName} · Destino: FCT NOVA</div>
         <p>Hora de partida: <strong>${ride.time}</strong></p>
         <p>Lugares disponíveis: <strong>${ride.seats}</strong></p>
         <button class="inline-btn" data-email="${ride.driverEmail}">Pedir boleia</button>
