@@ -27,10 +27,14 @@
         <div id="rideMessage" class="message hidden"></div>
 
         <form id="rideForm" class="styled-form">
-          <div class="form-grid two-columns">
+          <div class="form-grid two-columns align-end">
             <div>
               <label for="origin">Origem</label>
-              <input type="text" id="origin" placeholder="Escolhe no mapa ou escreve manualmente" required />
+              <div class="origin-input-row">
+                <input type="text" id="origin" placeholder="Ex: Corroios ou Rua da Liberdade, Almada" required />
+                <button type="button" id="findOriginBtn" class="secondary-btn map-search-btn">Encontrar no mapa</button>
+              </div>
+              <p class="helper-text helper-text-tight">Escreve uma zona, rua ou local e carrega em “Encontrar no mapa”.</p>
             </div>
 
             <div>
@@ -41,7 +45,7 @@
 
           <label>Ponto de partida no mapa</label>
           <div id="createRideMap"></div>
-          <p class="helper-text helper-text-tight">Clica no mapa para marcar o ponto de partida da boleia.</p>
+          <p class="helper-text helper-text-tight">Clica no mapa para marcar o ponto de partida da boleia ou pesquisa a origem pelo nome.</p>
 
           <input type="hidden" id="startLat" />
           <input type="hidden" id="startLng" />

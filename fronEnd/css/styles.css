@@ -635,3 +635,51 @@ textarea:focus {
     max-width: 100%;
   }
 }
+
+
+.form-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.form-grid.two-columns {
+  grid-template-columns: 1fr 1fr;
+}
+
+.form-grid.align-end {
+  align-items: end;
+}
+
+.origin-input-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.origin-input-row input {
+  margin-bottom: 0;
+}
+
+.map-search-btn {
+  width: auto;
+  white-space: nowrap;
+}
+
+.helper-text-tight {
+  margin-top: 8px;
+}
+
+@media (max-width: 900px) {
+  .form-grid.two-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .origin-input-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .map-search-btn {
+    width: 100%;
+  }
+}

@@ -155,8 +155,111 @@ if (rideForm) {
   }
 
   const createRideMapEl = document.getElementById("createRideMap");
+  const originInput = document.getElementById("origin");
+  const findOriginBtn = document.getElementById("findOriginBtn");
   let createRideMap = null;
   let selectedMarker = null;
+
+  async function reverseGeocode(lat, lng) {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
+      {
+        headers: {
+          "Accept": "application/json",
+          "Accept-Language": "pt-PT,pt;q=0.9"
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Falha ao converter coordenadas em morada.");
+    }
+
+    return response.json();
+  }
+
+  async function geocodeOrigin(query) {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=pt&q=${encodeURIComponent(query)}`,
+      {
+        headers: {
+          "Accept": "application/json",
+          "Accept-Language": "pt-PT,pt;q=0.9"
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Falha a procurar a origem.");
+    }
+
+    const results = await response.json();
+    if (!results.length) {
+      throw new Error("Não foi possível localizar essa origem no mapa.");
+    }
+
+    return results[0];
+  }
+
+  function setPickupPoint(lat, lng, label = "Ponto de partida") {
+    document.getElementById("startLat").value = Number(lat).toFixed(6);
+    document.getElementById("startLng").value = Number(lng).toFixed(6);
+
+    if (!createRideMap || typeof L === "undefined") return;
+
+    if (selectedMarker) {
+      selectedMarker.setLatLng([lat, lng]);
+    } else {
+      const pickupIcon = L.divIcon({
+        className: "pickup-marker-wrapper",
+        html: `<div class="pickup-marker"></div>`,
+        iconSize: [22, 22],
+        iconAnchor: [11, 11]
+      });
+
+      selectedMarker = L.marker([lat, lng], { icon: pickupIcon }).addTo(createRideMap);
+    }
+
+    if (label) {
+      selectedMarker.bindPopup(`<strong>${label}</strong>`);
+    }
+
+    createRideMap.setView([lat, lng], 14);
+  }
+
+  async function searchTypedOrigin() {
+    const query = originInput?.value.trim();
+    if (!query) {
+      showMessage("rideMessage", "Escreve uma origem para a localizar no mapa.", "error");
+      return false;
+    }
+
+    try {
+      hideMessage("rideMessage");
+      if (findOriginBtn) {
+        findOriginBtn.disabled = true;
+        findOriginBtn.textContent = "A procurar...";
+      }
+
+      const result = await geocodeOrigin(query);
+      const lat = Number(result.lat);
+      const lng = Number(result.lon);
+      const label = result.display_name || query;
+
+      originInput.value = label;
+      setPickupPoint(lat, lng, label);
+      showMessage("rideMessage", "Origem encontrada no mapa.", "success");
+      return true;
+    } catch (error) {
+      showMessage("rideMessage", error.message || "Não foi possível localizar essa origem.", "error");
+      return false;
+    } finally {
+      if (findOriginBtn) {
+        findOriginBtn.disabled = false;
+        findOriginBtn.textContent = "Encontrar no mapa";
+      }
+    }
+  }
 
   if (createRideMapEl && typeof L !== "undefined") {
     createRideMap = L.map("createRideMap").setView([38.661, -9.204], 11);
@@ -165,23 +268,23 @@ if (rideForm) {
       attribution: "© OpenStreetMap"
     }).addTo(createRideMap);
 
-    const pickupIcon = L.divIcon({
-      className: "pickup-marker-wrapper",
-      html: `<div class="pickup-marker"></div>`,
-      iconSize: [22, 22],
-      iconAnchor: [11, 11]
-    });
-
-    createRideMap.on("click", (e) => {
+    createRideMap.on("click", async (e) => {
       const { lat, lng } = e.latlng;
+      setPickupPoint(lat, lng);
 
-      document.getElementById("startLat").value = lat.toFixed(6);
-      document.getElementById("startLng").value = lng.toFixed(6);
-
-      if (selectedMarker) {
-        selectedMarker.setLatLng([lat, lng]);
-      } else {
-        selectedMarker = L.marker([lat, lng], { icon: pickupIcon }).addTo(createRideMap);
+      try {
+        const result = await reverseGeocode(lat, lng);
+        const label = result.display_name || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+        if (originInput) {
+          originInput.value = label;
+        }
+        if (selectedMarker) {
+          selectedMarker.bindPopup(`<strong>${label}</strong>`).openPopup();
+        }
+      } catch {
+        if (originInput && !originInput.value.trim()) {
+          originInput.value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+        }
       }
     });
 
@@ -190,7 +293,29 @@ if (rideForm) {
     }, 200);
   }
 
-  rideForm.addEventListener("submit", function (e) {
+  if (findOriginBtn) {
+    findOriginBtn.addEventListener("click", searchTypedOrigin);
+  }
+
+  if (originInput) {
+    originInput.addEventListener("keydown", async (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        await searchTypedOrigin();
+      }
+    });
+
+    originInput.addEventListener("blur", async () => {
+      const hasText = originInput.value.trim();
+      const hasCoords = document.getElementById("startLat").value && document.getElementById("startLng").value;
+
+      if (hasText && !hasCoords) {
+        await searchTypedOrigin();
+      }
+    });
+  }
+
+  rideForm.addEventListener("submit", async function (e) {
     e.preventDefault();
 
     const origin = document.getElementById("origin").value.trim();
@@ -201,8 +326,16 @@ if (rideForm) {
     const startLng = Number(document.getElementById("startLng").value);
     const user = getCurrentUser();
 
-    if (!startLat || !startLng) {
-      showMessage("rideMessage", "Escolhe o ponto de partida no mapa.", "error");
+    if ((!startLat || !startLng) && origin) {
+      const found = await searchTypedOrigin();
+      if (!found) return;
+    }
+
+    const finalStartLat = Number(document.getElementById("startLat").value);
+    const finalStartLng = Number(document.getElementById("startLng").value);
+
+    if (!finalStartLat || !finalStartLng) {
+      showMessage("rideMessage", "Escolhe o ponto de partida no mapa ou encontra a origem pelo nome.", "error");
       return;
     }
 
@@ -212,13 +345,13 @@ if (rideForm) {
       driverName: user.name,
       driverEmail: user.email,
       driverPhone: user.phone || "",
-      origin,
+      origin: document.getElementById("origin").value.trim(),
       destination: "FCT NOVA",
       comment,
       time,
       seats,
-      startLat,
-      startLng
+      startLat: finalStartLat,
+      startLng: finalStartLng
     };
 
     const rides = JSON.parse(localStorage.getItem(RIDES_KEY)) || [];
