@@ -61,11 +61,17 @@ if (registerForm) {
     e.preventDefault();
     const name = document.getElementById("registerName").value.trim();
     const email = document.getElementById("registerEmail").value.trim().toLowerCase();
+    const phone = document.getElementById("registerPhone").value.trim();
     const password = document.getElementById("registerPassword").value.trim();
     const confirmPassword = document.getElementById("registerConfirmPassword").value.trim();
 
     if (!isUniversityEmail(email)) {
       showMessage("message", "Usa um email universitário válido da FCT.", "error");
+      return;
+    }
+
+    if (!/^\d{9}$/.test(phone)) {
+      showMessage("message", "Introduz um número de telemóvel com 9 dígitos.", "error");
       return;
     }
 
@@ -91,12 +97,13 @@ if (registerForm) {
       id: Date.now(),
       name,
       email,
+      phone,
       password
     };
 
     users.push(newUser);
     saveUsers(users);
-    saveCurrentUser({ id: newUser.id, name, email });
+    saveCurrentUser({ id: newUser.id, name, email, phone });
 
     showMessage("message", "Conta criada com sucesso.", "success");
     setTimeout(() => {
@@ -122,7 +129,8 @@ if (loginForm) {
     saveCurrentUser({
       id: foundUser.id,
       name: foundUser.name,
-      email: foundUser.email
+      email: foundUser.email,
+      phone: foundUser.phone || ""
     });
 
     showMessage("message", "Login efetuado com sucesso.", "success");
@@ -188,6 +196,7 @@ if (rideForm) {
     const origin = document.getElementById("origin").value.trim();
     const time = document.getElementById("time").value;
     const seats = Number(document.getElementById("seats").value);
+    const comment = document.getElementById("rideComment").value.trim();
     const startLat = Number(document.getElementById("startLat").value);
     const startLng = Number(document.getElementById("startLng").value);
     const user = getCurrentUser();
@@ -202,8 +211,10 @@ if (rideForm) {
       driverId: user.id,
       driverName: user.name,
       driverEmail: user.email,
+      driverPhone: user.phone || "",
       origin,
       destination: "FCT NOVA",
+      comment,
       time,
       seats,
       startLat,

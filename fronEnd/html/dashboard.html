@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 </head>
 <body>
-  <main class="app-shell">
+  <main class="app-shell dashboard-shell">
     <header class="topbar">
       <div>
         <h1>Dashboard</h1>
@@ -16,37 +16,51 @@
       </div>
       <div class="topbar-actions">
         <a href="rides.html"><button class="secondary-btn">Ver boleias</button></a>
-        <button id="logoutBtn" class="primary-btn">Logout</button>
+        <a href="account.html"><button class="secondary-btn">Conta</button></a>
+        <button id="logoutBtn" class="primary-btn topbar-primary">Logout</button>
       </div>
     </header>
 
-    <section class="dashboard-grid">
-      <div class="card">
+    <section class="dashboard-single">
+      <div class="card ride-form-card wide-card">
         <h2 class="page-title">Criar boleia</h2>
         <div id="rideMessage" class="message hidden"></div>
 
         <form id="rideForm" class="styled-form">
-          <label for="origin">Origem</label>
-          <input type="text" id="origin" placeholder="Escolhe no mapa ou escreve manualmente" required />
+          <div class="form-grid two-columns">
+            <div>
+              <label for="origin">Origem</label>
+              <input type="text" id="origin" placeholder="Escolhe no mapa ou escreve manualmente" required />
+            </div>
+
+            <div>
+              <label for="time">Hora de partida</label>
+              <input type="time" id="time" required />
+            </div>
+          </div>
 
           <label>Ponto de partida no mapa</label>
           <div id="createRideMap"></div>
-          <p class="helper-text">Clica no mapa para marcar o ponto de partida da boleia.</p>
+          <p class="helper-text helper-text-tight">Clica no mapa para marcar o ponto de partida da boleia.</p>
 
           <input type="hidden" id="startLat" />
           <input type="hidden" id="startLng" />
 
-          <label for="time">Hora de partida</label>
-          <input type="time" id="time" required />
+          <div class="form-grid two-columns">
+            <div>
+              <label for="seats">Lugares disponíveis</label>
+              <input type="number" id="seats" min="1" max="8" placeholder="Ex: 3" required />
+            </div>
 
-          <label for="seats">Lugares disponíveis</label>
-          <input type="number" id="seats" min="1" max="8" placeholder="Ex: 3" required />
+            <div>
+              <label for="rideComment">Comentário</label>
+              <textarea id="rideComment" rows="4" placeholder="Ex: Passo pela estação de Corroios, posso esperar 5 minutos."></textarea>
+            </div>
+          </div>
 
           <button type="submit" class="primary-btn">Guardar boleia</button>
         </form>
       </div>
-
-      
     </section>
   </main>
 

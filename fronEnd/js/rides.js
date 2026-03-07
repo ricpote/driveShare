@@ -53,7 +53,8 @@ if (!rides.length) {
         <div class="ride-meta">${ride.driverName} · Destino: FCT NOVA</div>
         <p>Hora de partida: <strong>${ride.time}</strong></p>
         <p>Lugares disponíveis: <strong>${ride.seats}</strong></p>
-        <button class="inline-btn" data-email="${ride.driverEmail}">Pedir boleia</button>
+        ${ride.comment ? `<p class="ride-comment-preview">${ride.comment}</p>` : ""}
+        <button class="inline-btn" data-ride-id="${ride.id}">Pedir boleia</button>
       `;
 
       container.appendChild(card);
@@ -83,7 +84,11 @@ if (!rides.length) {
 
         rideEntries.push({ card, marker, route, ride });
 
-        card.addEventListener("click", () => focusRide(card, marker, ride));
+        card.addEventListener("click", (event) => {
+          if (event.target.matches(".inline-btn")) return;
+          focusRide(card, marker, ride);
+        });
+
         card.addEventListener("mouseenter", () => focusRide(card, marker, ride, true));
       }
     });
@@ -91,8 +96,8 @@ if (!rides.length) {
   container.addEventListener("click", (event) => {
     if (event.target.matches(".inline-btn")) {
       event.stopPropagation();
-      const email = event.target.dataset.email;
-      alert(`Contacta o condutor em: ${email}`);;
+      const rideId = event.target.dataset.rideId;
+      window.location.href = `ride-details.html?id=${rideId}`;
     }
   });
 

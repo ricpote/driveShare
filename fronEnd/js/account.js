@@ -11,10 +11,12 @@ if (!user) {
 const userNameEl = document.getElementById("userName");
 const userEmailEl = document.getElementById("userEmail");
 const userIdEl = document.getElementById("userId");
+const userPhoneEl = document.getElementById("userPhone");
 
 if (userNameEl) userNameEl.textContent = user.name || "—";
 if (userEmailEl) userEmailEl.textContent = user.email || "—";
 if (userIdEl) userIdEl.textContent = user.id || "—";
+if (userPhoneEl) userPhoneEl.textContent = user.phone || "—";
 
 const activeContainer = document.getElementById("activeRides");
 const historyContainer = document.getElementById("rideHistory");
