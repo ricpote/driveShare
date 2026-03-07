@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.ts"
+    "start": "tsx backend/server.ts"
   },
   "repository": {
     "type": "git",
@@ -14,7 +14,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/ricpote/driveShare/issues"
   },
@@ -32,6 +32,7 @@
     "@types/express": "^5.0.6",
     "@types/mongodb": "^4.0.6",
     "@types/mongoose": "^5.11.96",
-    "@types/node": "^25.3.5"
+    "@types/node": "^25.3.5",
+    "tsx": "^4.21.0"
   }
 }

@@ -1,6 +1,9 @@
 import express from 'express';
 import { MongoClient, Db } from 'mongodb';
 import cors from 'cors';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
 const PORT = 5000;
@@ -8,30 +11,22 @@ const PORT = 5000;
 app.use(cors());
 app.use(express.json());
 
-// MongoDB
-const uri = 'mongodb://localhost:27017';
-const client = new MongoClient(uri);
-
 let db: Db;
+const client = new MongoClient(process.env.MONGO_URI as string);
 
-async function connectDB() {
-  await client.connect();
-  db = client.db('boletim-uni');
-  console.log('MongoDB conectado com sucesso!');
-}
+async function startServer(){
+  try{
+    await client.connect();
+    db = client.db("teste");
+    console.log("MongoDB connected!");
 
-connectDB().catch(console.error);
+    app.listen(3000, () =>{
+      console.log(`Server running on port ${PORT}`);
+    })
+  }catch(err){
+    console.error(err);
+  }
+};
 
-// Rotas de exemplo
-app.get('/rides', async (req, res) => {
-  const rides = await db.collection('rides').find({}).toArray();
-  res.json(rides);
-});
+startServer();
 
-app.post('/rides', async (req, res) => {
-  const ride = req.body;
-  const result = await db.collection('rides').insertOne(ride);
-  res.json(result);
-});
-
-app.listen(PORT, () => console.log(`Servidor a correr na porta ${PORT}`));
