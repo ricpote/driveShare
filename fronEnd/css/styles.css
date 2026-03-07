@@ -91,6 +91,23 @@ body {
   padding: 28px;
 }
 
+.mapcard{
+  width: 100%;
+  max-width: 700px;
+  background: var(--surface);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  padding: 28px;
+}
+
+.rides-layout {
+  display: flex;
+  gap: 20px;
+}
+
+.rides-layout .card {
+  flex: 1;
+}
 .tabs {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -317,4 +334,11 @@ input:focus {
     flex-direction: column;
     align-items: flex-start;
   }
+}
+
+#map {
+  height: 350px;
+  width: 100%;
+  border-radius: 16px;
+  margin-bottom: 20px;
 }

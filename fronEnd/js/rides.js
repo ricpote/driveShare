@@ -1,6 +1,12 @@
 const container = document.getElementById("ridesContainer");
 const rides = JSON.parse(localStorage.getItem("rides")) || [];
 
+const map = L.map('map').setView([38.661, -9.204], 11);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap'
+}).addTo(map);
+
 if (!rides.length) {
   container.innerHTML = '<div class="empty-state">Ainda não existem boleias criadas.</div>';
 } else {
