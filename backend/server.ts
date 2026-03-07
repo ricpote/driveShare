@@ -2,6 +2,7 @@ import express from 'express';
 import { MongoClient, Db } from 'mongodb';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import userRoutes from "./routes/userRoute";
 
 dotenv.config();
 
@@ -20,7 +21,10 @@ const startServer = async() =>{
     db = client.db("teste");
     console.log("MongoDB connected!");
 
-    app.listen(3000, () =>{
+    app.use("/api/users", userRoutes(db));
+    
+
+    app.listen(PORT, () =>{
       console.log(`Server running on port ${PORT}`);
     })
   }catch(err){

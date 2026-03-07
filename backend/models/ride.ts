@@ -10,5 +10,4 @@ export interface IRide {
   totalSeats: number;
   availableSeats: number;   // Lugares disponíveis
   createdAt?: Date; 
-  updatedAt?: Date;
 }
