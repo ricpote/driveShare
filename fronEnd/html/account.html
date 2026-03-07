@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UniRide | Conta</title>
+
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+
+<body>
+
+  <main class="app-shell">
+
+    <header class="topbar">
+      <div>
+        <h1>A minha conta</h1>
+        <p>Consulta os teus dados e atividade no UniRide.</p>
+      </div>
+
+      <div class="topbar-actions">
+        <a href="rides.html">
+          <button class="secondary-btn">Boleias</button>
+        </a>
+
+        <a href="dashboard.html">
+          <button class="secondary-btn">Dashboard</button>
+        </a>
+      </div>
+    </header>
+
+    <section class="dashboard-grid">
+
+      <!-- BOLEIAS ATIVAS -->
+      <div class="card">
+        <h2 class="page-title">Boleias abertas</h2>
+
+        <div id="activeRides">
+          <div class="empty-state">
+            Ainda não tens boleias ativas.
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTÓRICO -->
+      <div class="card">
+        <h2 class="page-title">Histórico de boleias</h2>
+
+        <div id="rideHistory">
+          <div class="empty-state">
+            Ainda não tens histórico de boleias.
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- DADOS PESSOAIS -->
+    <section class="card" style="margin-top:20px;">
+      <h2 class="page-title">Dados pessoais</h2>
+
+      <div id="userInfo">
+
+        <p><strong>Nome:</strong> <span id="userName">—</span></p>
+
+        <p><strong>Email:</strong> <span id="userEmail">—</span></p>
+
+      
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <script src="../js/account.js"></script>
+
+</body>
+</html>
