@@ -1,52 +1,50 @@
 const container = document.getElementById("ridesContainer");
 const rides = JSON.parse(localStorage.getItem("rides")) || [];
 
-/* Coordenadas da FCT */
 const FCT = {
   lat: 38.661,
   lng: -9.204
 };
 
-/* Criar mapa */
 const map = L.map("map").setView([FCT.lat, FCT.lng], 11);
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution: "© OpenStreetMap"
 }).addTo(map);
 
-/* Marker da FCT */
-L.marker([FCT.lat, FCT.lng])
+const campusIcon = L.divIcon({
+  className: "campus-marker-wrapper",
+  html: `<div class="campus-marker">FCT</div>`,
+  iconSize: [42, 42],
+  iconAnchor: [21, 21]
+});
+
+const rideIcon = L.divIcon({
+  className: "ride-marker-wrapper",
+  html: `<div class="ride-marker"></div>`,
+  iconSize: [22, 22],
+  iconAnchor: [11, 11]
+});
+
+const activeRideIcon = L.divIcon({
+  className: "ride-marker-wrapper",
+  html: `<div class="ride-marker active"></div>`,
+  iconSize: [26, 26],
+  iconAnchor: [13, 13]
+});
+
+L.marker([FCT.lat, FCT.lng], { icon: campusIcon })
   .addTo(map)
-  .bindPopup("<b>FCT NOVA</b><br>Destino das boleias")
-  .openPopup();
+  .bindPopup("<b>FCT NOVA</b><br>Destino das boleias");
 
-
-/* Função para converter origem → coordenadas */
-async function getCoordinates(place) {
-  const response = await fetch(
-    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(place)}`
-  );
-
-  const data = await response.json();
-
-  if (!data.length) return null;
-
-  return {
-    lat: parseFloat(data[0].lat),
-    lng: parseFloat(data[0].lon)
-  };
-}
-
+const rideEntries = [];
 
 if (!rides.length) {
-  container.innerHTML =
-    '<div class="empty-state">Ainda não existem boleias criadas.</div>';
+  container.innerHTML = '<div class="empty-state">Ainda não existem boleias criadas.</div>';
 } else {
   rides
     .sort((a, b) => a.time.localeCompare(b.time))
-    .forEach(async (ride) => {
-
-      /* Criar card */
+    .forEach((ride) => {
       const card = document.createElement("article");
       card.className = "ride-card";
 
@@ -55,42 +53,83 @@ if (!rides.length) {
         <div class="ride-meta">${ride.driverName} · Destino: FCT NOVA</div>
         <p>Hora de partida: <strong>${ride.time}</strong></p>
         <p>Lugares disponíveis: <strong>${ride.seats}</strong></p>
-        <button class="inline-btn" data-email="${ride.driverEmail}">
-          Pedir boleia
-        </button>
+        <button class="inline-btn" data-email="${ride.driverEmail}">Pedir boleia</button>
       `;
 
       container.appendChild(card);
 
-      /* Obter coordenadas da origem */
-      const coords = await getCoordinates(ride.origin);
+      if (ride.startLat && ride.startLng) {
+        const marker = L.marker([ride.startLat, ride.startLng], { icon: rideIcon }).addTo(map);
 
-      if (!coords) return;
+        const route = L.polyline(
+          [
+            [ride.startLat, ride.startLng],
+            [FCT.lat, FCT.lng]
+          ],
+          {
+            color: "#136f63",
+            weight: 4,
+            opacity: 0.35,
+            dashArray: "8 8"
+          }
+        ).addTo(map);
 
-      /* Criar marker */
-      const marker = L.marker([coords.lat, coords.lng]).addTo(map);
+        marker.bindPopup(`
+          <b>${ride.driverName}</b><br>
+          ${ride.origin} → ${ride.destination}<br>
+          Hora: ${ride.time}<br>
+          Lugares: ${ride.seats}
+        `);
 
-      marker.bindPopup(`
-        <b>${ride.origin} → ${ride.destination}</b><br>
-        Hora: ${ride.time}<br>
-        Lugares: ${ride.seats}
-      `);
+        rideEntries.push({ card, marker, route, ride });
 
-      /* Desenhar rota até à FCT */
-      L.polyline(
-        [
-          [coords.lat, coords.lng],
-          [FCT.lat, FCT.lng]
-        ],
-        { color: "#136f63", weight: 3 }
-      ).addTo(map);
+        card.addEventListener("click", () => focusRide(card, marker, ride));
+        card.addEventListener("mouseenter", () => focusRide(card, marker, ride, true));
+      }
     });
 
   container.addEventListener("click", (event) => {
     if (event.target.matches(".inline-btn")) {
+      event.stopPropagation();
       const email = event.target.dataset.email;
-
-      alert(`Pedido registado. Contacta o condutor em: ${email}`);
+      window.location.href = `mailto:${email}?subject=Pedido%20de%20boleia%20UniRide`;
     }
   });
+
+  const allMarkers = rideEntries.map((entry) => entry.marker);
+  if (allMarkers.length) {
+    const group = L.featureGroup([
+      ...allMarkers,
+      L.marker([FCT.lat, FCT.lng])
+    ]);
+    map.fitBounds(group.getBounds().pad(0.2));
+  }
+}
+
+function focusRide(card, marker, ride, soft = false) {
+  rideEntries.forEach((entry) => {
+    entry.card.classList.remove("ride-card-active");
+    entry.marker.setIcon(rideIcon);
+    entry.route.setStyle({
+      opacity: 0.25,
+      weight: 4
+    });
+  });
+
+  card.classList.add("ride-card-active");
+  marker.setIcon(activeRideIcon);
+
+  const current = rideEntries.find((entry) => entry.marker === marker);
+  if (current) {
+    current.route.setStyle({
+      opacity: 0.8,
+      weight: 5
+    });
+  }
+
+  map.flyTo([ride.startLat, ride.startLng], soft ? 12 : 13, {
+    duration: 0.8
+  });
+
+  marker.openPopup();
 }

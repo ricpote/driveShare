@@ -61,7 +61,6 @@ if (registerForm) {
     e.preventDefault();
     const name = document.getElementById("registerName").value.trim();
     const email = document.getElementById("registerEmail").value.trim().toLowerCase();
-
     const password = document.getElementById("registerPassword").value.trim();
     const confirmPassword = document.getElementById("registerConfirmPassword").value.trim();
 
@@ -97,7 +96,7 @@ if (registerForm) {
 
     users.push(newUser);
     saveUsers(users);
-    saveCurrentUser({ id: newUser.id, name, email, });
+    saveCurrentUser({ id: newUser.id, name, email });
 
     showMessage("message", "Conta criada com sucesso.", "success");
     setTimeout(() => {
@@ -123,8 +122,7 @@ if (loginForm) {
     saveCurrentUser({
       id: foundUser.id,
       name: foundUser.name,
-      email: foundUser.email,
-
+      email: foundUser.email
     });
 
     showMessage("message", "Login efetuado com sucesso.", "success");
@@ -137,6 +135,7 @@ if (loginForm) {
 const rideForm = document.getElementById("rideForm");
 if (rideForm) {
   const currentUser = getCurrentUser();
+
   if (!currentUser) {
     window.location.href = "index.html";
   } else {
@@ -147,13 +146,56 @@ if (rideForm) {
     updateDashboardStats();
   }
 
+  const createRideMapEl = document.getElementById("createRideMap");
+  let createRideMap = null;
+  let selectedMarker = null;
+
+  if (createRideMapEl && typeof L !== "undefined") {
+    createRideMap = L.map("createRideMap").setView([38.661, -9.204], 11);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "© OpenStreetMap"
+    }).addTo(createRideMap);
+
+    const pickupIcon = L.divIcon({
+      className: "pickup-marker-wrapper",
+      html: `<div class="pickup-marker"></div>`,
+      iconSize: [22, 22],
+      iconAnchor: [11, 11]
+    });
+
+    createRideMap.on("click", (e) => {
+      const { lat, lng } = e.latlng;
+
+      document.getElementById("startLat").value = lat.toFixed(6);
+      document.getElementById("startLng").value = lng.toFixed(6);
+
+      if (selectedMarker) {
+        selectedMarker.setLatLng([lat, lng]);
+      } else {
+        selectedMarker = L.marker([lat, lng], { icon: pickupIcon }).addTo(createRideMap);
+      }
+    });
+
+    setTimeout(() => {
+      createRideMap.invalidateSize();
+    }, 200);
+  }
+
   rideForm.addEventListener("submit", function (e) {
     e.preventDefault();
 
     const origin = document.getElementById("origin").value.trim();
     const time = document.getElementById("time").value;
     const seats = Number(document.getElementById("seats").value);
+    const startLat = Number(document.getElementById("startLat").value);
+    const startLng = Number(document.getElementById("startLng").value);
     const user = getCurrentUser();
+
+    if (!startLat || !startLng) {
+      showMessage("rideMessage", "Escolhe o ponto de partida no mapa.", "error");
+      return;
+    }
 
     const ride = {
       id: Date.now(),
@@ -163,7 +205,9 @@ if (rideForm) {
       origin,
       destination: "FCT NOVA",
       time,
-      seats
+      seats,
+      startLat,
+      startLng
     };
 
     const rides = JSON.parse(localStorage.getItem(RIDES_KEY)) || [];
@@ -172,6 +216,14 @@ if (rideForm) {
 
     showMessage("rideMessage", "Boleia guardada com sucesso.", "success");
     rideForm.reset();
+
+    document.getElementById("startLat").value = "";
+    document.getElementById("startLng").value = "";
+
+    if (selectedMarker && createRideMap) {
+      createRideMap.removeLayer(selectedMarker);
+      selectedMarker = null;
+    }
 
     updateDashboardStats();
   });

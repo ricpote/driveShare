@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UniRide | Dashboard</title>
   <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 </head>
 <body>
   <main class="app-shell">
@@ -26,9 +27,14 @@
 
         <form id="rideForm" class="styled-form">
           <label for="origin">Origem</label>
-          <input type="text" id="origin" placeholder="Ex: Almada" required />
+          <input type="text" id="origin" placeholder="Escolhe no mapa ou escreve manualmente" required />
 
-         
+          <label>Ponto de partida no mapa</label>
+          <div id="createRideMap"></div>
+          <p class="helper-text">Clica no mapa para marcar o ponto de partida da boleia.</p>
+
+          <input type="hidden" id="startLat" />
+          <input type="hidden" id="startLng" />
 
           <label for="time">Hora de partida</label>
           <input type="time" id="time" required />
@@ -61,6 +67,7 @@
     </section>
   </main>
 
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="../js/main.js"></script>
 </body>
 </html>
