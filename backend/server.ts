@@ -14,7 +14,7 @@ app.use(express.json());
 let db: Db;
 const client = new MongoClient(process.env.MONGO_URI as string);
 
-async function startServer(){
+const startServer = async() =>{
   try{
     await client.connect();
     db = client.db("teste");

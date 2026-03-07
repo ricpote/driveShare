@@ -7,7 +7,8 @@ export interface IRide {
   from: string;             // Local de partida
   to: string;               // Destino
   date: Date;               // Data/hora da boleia
-  seatsAvailable: number;   // Lugares disponíveis
+  totalSeats: number;
+  availableSeats: number;   // Lugares disponíveis
   createdAt?: Date; 
   updatedAt?: Date;
 }
