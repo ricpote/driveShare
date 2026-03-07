@@ -3,7 +3,7 @@ import { Db, ObjectId } from "mongodb";
 import { authMiddleware } from "../middleware/authMiddleware";
 import { IRide } from "../models/ride";
 
-export default function rideRoutes(db: Db) {
+export default function rideRoute(db: Db) {
   const router = Router();
 
   router.post("/", authMiddleware, async (req, res) => {
