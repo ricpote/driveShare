@@ -5,50 +5,105 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UniRide | Conta</title>
   <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 </head>
+
 <body>
-  <main class="app-shell">
+  <main class="app-shell account-sections">
+
     <header class="topbar">
       <div>
-        <h1>Conta</h1>
-        <p>Resumo da tua atividade e gestão de pedidos.</p>
+        <h1>A minha conta</h1>
+        <p>Consulta os teus dados e atividade no UniRide.</p>
       </div>
+
       <div class="topbar-actions">
-        <a href="dashboard.html"><button class="secondary-btn">Marcar Viagem</button></a>
-        <a href="rides.html"><button class="secondary-btn">Viagens</button></a>
-        <button id="logoutBtn" class="primary-btn topbar-btn">Logout</button>
+        <a href="dashboard.html">
+          <button class="secondary-btn">Dashboard</button>
+        </a>
+        <a href="rides.html">
+          <button class="secondary-btn">Boleias</button>
+        </a>
+        <a>
+          <button id="logoutBtn" class="primary-btn topbar-primary">Logout</button>
+        </a>
       </div>
     </header>
 
-    <div id="accountMessage" class="message hidden"></div>
+    <section class="account-layout">
 
-    <section class="dashboard-grid dashboard-grid-wide">
+      <!-- BOLEIAS MARCADAS -->
+      <div class="card rides-active-card">
+        <h2 class="page-title">Boleias marcadas</h2>
+
+        <!-- Container que será atualizado dinamicamente -->
+        <div id="rideActiveContainer"></div>
+        <div class="empty-state">
+            Ainda não tens boleias marcadas.  
+          </div>
+      </div>
+
+      <!-- HISTÓRICO -->
       <div class="card">
-        <h2 class="page-title">Perfil</h2>
-        <div class="profile-block">
-          <strong id="profileName">Utilizador</strong>
-          <span id="profileEmail"></span>
+        <div class="history-header">
+          <h2 class="page-title">Histórico de boleias dadas</h2>
+        </div>
+
+        <div id="rideHistory">
+          <div class="empty-state">
+            Ainda não tens histórico de boleias.
+          </div>
         </div>
       </div>
-      <div class="card">
-        <h2 class="page-title">Pedidos pendentes nas tuas boleias</h2>
-        <div id="requestsContainer"></div>
-      </div>
-    </section>
 
-    <section class="dashboard-grid dashboard-grid-wide account-sections">
-      <div class="card list-card">
-        <h2 class="page-title">As tuas boleias</h2>
-        <div id="myRidesContainer"></div>
-      </div>
-      <div class="card list-card">
-        <h2 class="page-title">Boleias em que participas</h2>
-        <div id="joinedRidesContainer"></div>
+      <!-- RESUMO CONTA -->
+      <div class="card account-main-card">
+        <h2 class="page-title">Resumo da conta</h2>
+
+        <div class="stats">
+          <div class="stat">
+            <strong id="totalRides">0</strong>
+            <span>Boleias criadas</span>
+          </div>
+
+          <div class="stat">
+            <strong id="co2Saved">0 kg</strong>
+            <span>CO₂ estimado poupado</span>
+          </div>
+        </div>
+
+        <div class="account-user-block">
+          <h3 class="section-subtitle">Dados pessoais
+            <button id="editUserBtn" class="secondary-btn small-btn">Editar</button>
+          </h3>
+          
+          <div class="user-info-grid" id="userInfoGrid">
+            <div class="info-item">
+              <span class="info-label">Nome</span>
+              <strong id="profileName">—</strong>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">Email</span>
+              <strong id="userEmail">—</strong>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">Telemóvel</span>
+              <strong id="userPhone">—</strong>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">ID de utilizador</span>
+              <strong id="userId">—</strong>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   </main>
 
-  <script src="../js/main.js"></script>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="../js/account.js"></script>
 </body>
 </html>

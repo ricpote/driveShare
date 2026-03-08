@@ -257,6 +257,7 @@ if (registerForm) {
 
     const name = document.getElementById("registerName").value.trim();
     const email = document.getElementById("registerEmail").value.trim().toLowerCase();
+    const phone = document.getElementById("registerPhone").value.trim();
     const password = document.getElementById("registerPassword").value.trim();
     const confirmPassword = document.getElementById("registerConfirmPassword").value.trim();
 
@@ -265,10 +266,10 @@ if (registerForm) {
     if (password !== confirmPassword) return showMessage("message", "As palavras-passe não coincidem.", "error");
 
     try {
-      await apiFetch("/users/register", { method: "POST", body: JSON.stringify({ name, email, password, phone: "" }) });
+      await apiFetch("/users/register", { method: "POST", body: JSON.stringify({ name, email, password, phone }) });
       const loginResult = await apiFetch("/users/login", { method: "POST", body: JSON.stringify({ email, password }) });
       saveToken(loginResult.token);
-      saveCurrentUser({ name, email });
+      saveCurrentUser({ name, email, phone });
       showMessage("message", "Conta criada com sucesso.", "success");
       setTimeout(() => { window.location.href = "dashboard.html"; }, 700);
     } catch (error) {

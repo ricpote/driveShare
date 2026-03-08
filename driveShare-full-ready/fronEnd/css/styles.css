@@ -37,7 +37,7 @@ input:focus { outline: none; border-color: var(--primary); }
 .primary-btn, .secondary-btn, .inline-btn { border: none; cursor: pointer; border-radius: 12px; padding: 13px 16px; font-size: 15px; font-weight: bold; }
 .primary-btn { width: 100%; background: var(--primary); color: white; }
 .primary-btn:hover, .inline-btn:hover { background: var(--primary-dark); }
-.secondary-btn { background: #e8f2f0; color: var(--primary); }
+.secondary-btn { width: 100%; background: #e8f2f0; color: var(--primary); }
 .inline-btn { background: var(--primary); color: white; width: auto; }
 .small-btn { padding: 10px 12px; }
 .danger-btn { background: var(--danger); }
