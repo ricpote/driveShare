@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { Db } from "mongodb";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { IUser } from "../models/User";
+import { IUser } from "../models/user";
 
 export const registerUser = (db: Db) => async (req: Request, res: Response) => {
   try {

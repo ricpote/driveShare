@@ -3,6 +3,7 @@ import { MongoClient, Db } from 'mongodb';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import userRoutes from "./routes/userRoute";
+import rideRoutes from "./routes/rideRoute";
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ const startServer = async() =>{
     console.log("MongoDB connected!");
 
     app.use("/api/users", userRoutes(db));
+    app.use("/api/rides", rideRoutes(db));
     
 
     app.listen(PORT, () =>{
