@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Db } from "mongodb";
+import { Db, ObjectId } from "mongodb";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { IUser } from "../models/user";
@@ -121,6 +121,26 @@ export const googleAuthCallback = (db: Db) => async (req: Request, res: Response
   } catch (err) {
     console.error("Erro no Google Callback:", err);
     res.redirect("/index.html?error=server_error");
+  }
+};
+
+export const getCurrentUser = (db: Db) => async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).userId;
+
+    const user = await db.collection<IUser>("users").findOne(
+      { _id: new ObjectId(userId) },
+      { projection: { password: 0 } } // nunca enviar password
+    );
+
+    if (!user) {
+      return res.status(404).json({ error: "Utilizador não encontrado" });
+    }
+
+    res.json(user);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erro ao obter utilizador" });
   }
 };
 

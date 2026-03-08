@@ -1,30 +1,30 @@
 import { Router } from "express";
-import { registerUser, loginUser, googleAuthCallback } from "../controllers/userController";
+import { registerUser, loginUser, googleAuthCallback, getCurrentUser } from "../controllers/userController";
 import { Db } from "mongodb";
 import passport from "passport";
+import { authMiddleware } from "../middleware/authMiddleware";
 
 export default function userRoutes(db: Db) {
   const router = Router();
 
-  // Rotas atuais (Username/Password)
+  // Rotas atuais
   router.post("/register", registerUser(db));
   router.post("/login", loginUser(db));
 
-  // --- NOVAS ROTAS OAUTH ---
+  // ROTA NOVA (dados do utilizador logado)
+  router.get("/me", authMiddleware, getCurrentUser(db));
 
-  // 1. Inicia o fluxo do Google
+  // Google OAuth
   router.get("/auth/google", 
     passport.authenticate("google", { 
       scope: ["profile", "email"],
-      // Tenta forçar o Google a mostrar apenas contas da faculdade na UI
       hd: "campus.fct.unl.pt" 
     })
   );
 
-  // 2. Callback onde o Google devolve os dados
   router.get("/auth/google/callback", 
     passport.authenticate("google", { session: false, failureRedirect: "/login?error=failed" }),
-    googleAuthCallback(db) // Controller que criaremos para validar o domínio
+    googleAuthCallback(db)
   );
 
   return router;
