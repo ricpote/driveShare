@@ -103,6 +103,10 @@ export const googleAuthCallback = (db: Db) => async (req: Request, res: Response
       user = { ...newUser, _id: result.insertedId };
     }
 
+    if (!user) {
+      return res.redirect("/index.html?error=user_creation_failed");
+    }
+
     // GERAÇÃO DO JWT (Mesmo formato que usas no loginUser)
     const token = jwt.sign(
       { userId: user._id, email: user.email },
