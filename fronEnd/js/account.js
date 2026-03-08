@@ -337,3 +337,4 @@ document.addEventListener("click", e => {
   localStorage.setItem(RIDES_KEY, JSON.stringify(rides));
   location.reload();
 });
+

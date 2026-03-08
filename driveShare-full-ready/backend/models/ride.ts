@@ -9,5 +9,6 @@ export interface IRide {
   date: Date;               // Data/hora da boleia
   totalSeats: number;
   availableSeats: number;   // Lugares disponíveis
+  comment: string;          // Comment (description)
   createdAt?: Date; 
 }

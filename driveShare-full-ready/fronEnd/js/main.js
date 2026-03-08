@@ -382,6 +382,7 @@ if (rideForm) {
     const day = document.getElementById("rideDate").value;
     const time = document.getElementById("time").value;
     const totalSeats = Number(document.getElementById("seats").value);
+    const comment = document.getElementById("time").value.trim();
 
     if (!day || !time) return showMessage("rideMessage", "Escolhe data e hora da boleia.", "error");
     if (!from || !to) return showMessage("rideMessage", "Define origem e destino.", "error");
@@ -395,6 +396,7 @@ if (rideForm) {
           to,
           date,
           totalSeats,
+          comment,
           fromCoords: {
             lat: Number(document.getElementById("fromLat").value) || null,
             lng: Number(document.getElementById("fromLng").value) || null,

@@ -58,7 +58,7 @@ input:focus { outline: none; border-color: var(--primary); }
 .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 18px; }
 .stat { background: #f8fbfa; border: 1px solid var(--border); border-radius: 14px; padding: 16px; text-align: center; }
 .stat strong { display: block; font-size: 28px; }
-.leaflet-map { height: 360px; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 12px; }
+.leaflet-map { height: 460px; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 12px; }
 .input-with-suggestions { position: relative; }
 .suggestions { position: absolute; top: calc(100% - 10px); left: 0; right: 0; z-index: 500; background: white; border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); max-height: 220px; overflow-y: auto; }
 .suggestion-item { display: block; width: 100%; border: 0; background: white; text-align: left; padding: 12px 14px; cursor: pointer; }
@@ -76,6 +76,11 @@ input:focus { outline: none; border-color: var(--primary); }
 .profile-block strong { font-size: 24px; }
 .action-row { display: flex; gap: 10px; flex-wrap: wrap; }
 .account-sections { margin-top: 20px; }
+.datetime-row {display: flex;gap: 12px;}
+.datetime-item {flex: 1;display: flex;flex-direction: column;}
+textarea { width: 100%; padding: 13px 14px; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 16px; font-size: 15px; font-family: Arial, sans-serif; resize: vertical; min-height: 110px;}
+textarea:focus {outline: none;border-color: var(--primary);box-shadow: 0 0 0 3px rgba(19, 111, 99, 0.08);}
+textarea::placeholder {color: var(--muted);}
 
 @media (max-width: 960px) {
   .auth-page, .dashboard-grid { grid-template-columns: 1fr; }
