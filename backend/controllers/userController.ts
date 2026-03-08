@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { Db } from "mongodb";
+import { ObjectId} from "mongodb";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { IUser } from "../models/user";
@@ -21,6 +22,8 @@ export const registerUser = (db: Db) => async (req: Request, res: Response) => {
       email,
       password: hashedPassword,
       phone,
+      ratingAverage: null,
+      ratingCount: 0,
       createdAt: new Date()
     };
 
@@ -96,6 +99,8 @@ export const googleAuthCallback = (db: Db) => async (req: Request, res: Response
         name,
         email,
         authType: "google", // Marcamos como utilizador OAuth
+        ratingAverage: null,
+        ratingCount: 0,
         createdAt: new Date(),
         // Para utilizadores Google, deixamos a password vazia ou indefinida
       };
@@ -121,6 +126,43 @@ export const googleAuthCallback = (db: Db) => async (req: Request, res: Response
   } catch (err) {
     console.error("Erro no Google Callback:", err);
     res.redirect("/index.html?error=server_error");
+  }
+};
+
+export const rateUser = (db: Db) => async (req: Request, res: Response) => {
+  try {
+    const { userId, rating } = req.body;
+
+    if (rating < 1 || rating > 5) {
+      return res.status(400).json({ error: "Rating deve ser entre 1 e 5" });
+    }
+
+    const users = db.collection<IUser>("users");
+    const user = await users.findOne({ _id: new ObjectId(userId) });
+
+    if (!user) return res.status(404).json({ error: "Utilizador não encontrado" });
+
+    const currentAverage = user.ratingAverage || 0;
+    const currentCount = user.ratingCount || 0;
+
+    const newCount = currentCount + 1;
+    const newAverage = (currentAverage * currentCount + rating) / newCount;
+
+    await users.updateOne(
+      { _id: user._id },
+      {
+        $set: {
+          ratingAverage: newAverage,
+          ratingCount: newCount
+        }
+      }
+    );
+
+    res.json({ message: "Rating atualizado", ratingAverage: newAverage });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erro ao avaliar utilizador" });
   }
 };
 

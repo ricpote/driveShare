@@ -7,4 +7,6 @@ export interface IUser {
   password: string;    // Password (pode ser hash)
   phone: string;      // Telefone 
   createdAt?: Date;    // Data de criação
+  ratingAverage?: number | null; // média dos ratings recebidos
+  ratingCount?: number;   //numero de ratings
 }

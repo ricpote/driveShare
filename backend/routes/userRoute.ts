@@ -10,6 +10,9 @@ export default function userRoutes(db: Db) {
   router.post("/register", registerUser(db));
   router.post("/login", loginUser(db));
 
+  // Rota do rate 676767676767
+  router.post("/rate", rateUser(db));
+
   // --- NOVAS ROTAS OAUTH ---
 
   // 1. Inicia o fluxo do Google
