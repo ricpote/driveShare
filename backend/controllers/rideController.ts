@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { Db, ObjectId } from "mongodb";
 import { IRide } from "../models/ride";
-import { IRideRequest } from "../models/rideRequest";
 
 export const createRide = (db: Db) => async (req: Request, res: Response) => {
   try {
@@ -156,7 +155,7 @@ export const getRideRequests = (db: Db) => async (req: Request, res: Response) =
 export const acceptRideRequest = (db: Db) => async (req: Request, res: Response) => {
   try {
     const rideId = req.params.rideId as string;
-    const requestId = req.params.rId as string;
+    const requestId = req.params.rideId as string;
 
     const request = await db.collection("rideRequests").findOne({
       _id: new ObjectId(requestId)
