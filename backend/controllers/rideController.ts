@@ -155,7 +155,7 @@ export const getRideRequests = (db: Db) => async (req: Request, res: Response) =
 export const acceptRideRequest = (db: Db) => async (req: Request, res: Response) => {
   try {
     const rideId = req.params.rideId as string;
-    const requestId = req.params.rideId as string;
+    const requestId = req.params.requestId as string;
 
     const request = await db.collection("rideRequests").findOne({
       _id: new ObjectId(requestId)
