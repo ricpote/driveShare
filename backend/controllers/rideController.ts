@@ -6,7 +6,7 @@ export const createRide = (db: Db) => async (req: Request, res: Response) => {
   try {
     const { from, to, date, arrivalTime, totalSeats } = req.body;
 
-    if (!from || !to || !date || !totalSeats) {
+    if (!from || !to || !date || !arrivalTime ||!totalSeats) {
       return res.status(400).json({ error: "Todos os campos são obrigatórios" });
     }
 
