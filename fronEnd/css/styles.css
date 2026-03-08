@@ -829,3 +829,30 @@ gap:8px;
 .passenger-card:hover{
   background:#ececec;
 }
+
+.carousel-container {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 10px 0;
+}
+.carousel-container::-webkit-scrollbar {
+  height: 8px;
+}
+.carousel-container::-webkit-scrollbar-thumb {
+  background: #136f63;
+  border-radius: 4px;
+}
+.ride-active-carousel-item {
+  min-width: 250px;
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  background: #f7f7f7;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.hidden {
+  display: none;
+}
