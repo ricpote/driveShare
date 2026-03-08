@@ -43,7 +43,7 @@ if (!rides.length) {
   container.innerHTML = '<div class="empty-state">Ainda não existem boleias criadas.</div>';
 } else {
   rides
-    .sort((a, b) => a.time.localeCompare(b.time))
+    .sort((a, b) => String(a.time).localeCompare(String(b.time)))
     .forEach((ride) => {
       const card = document.createElement("article");
       card.className = "ride-card";
@@ -138,3 +138,5 @@ function focusRide(card, marker, ride, soft = false) {
 
   marker.openPopup();
 }
+
+

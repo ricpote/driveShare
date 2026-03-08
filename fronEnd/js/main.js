@@ -34,6 +34,7 @@ function hideMessage(elementId) {
 }
 
 function isUniversityEmail(email) {
+  if (!email.includes("@")) return false;
   const domain = email.split("@")[1]?.toLowerCase();
   return allowedDomains.includes(domain);
 }
@@ -339,6 +340,8 @@ if (rideForm) {
       return;
     }
 
+    const time = document.getElementById("time").value;
+
     const ride = {
       id: Date.now(),
       driverId: user.id,
@@ -389,10 +392,3 @@ function updateDashboardStats() {
   if (co2El) co2El.textContent = `${estimatedCo2} kg`;
 }
 
-const logoutBtn = document.getElementById("logoutBtn");
-if (logoutBtn) {
-  logoutBtn.addEventListener("click", () => {
-    localStorage.removeItem(SESSION_KEY);
-    window.location.href = "index.html";
-  });
-}

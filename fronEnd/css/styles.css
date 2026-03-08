@@ -794,3 +794,10 @@ gap:8px;
     flex-direction: column;
   }
 }
+
+#rideMap {
+  width: 100%;
+  height: 300px; /* ou 400px se quiseres maior */
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
