@@ -4,7 +4,7 @@ import { IRide } from "../models/ride";
 
 export const createRide = (db: Db) => async (req: Request, res: Response) => {
   try {
-    const { from, to, date, totalSeats } = req.body;
+    const { from, to, date, arrivalTime, totalSeats } = req.body;
 
     if (!from || !to || !date || !totalSeats) {
       return res.status(400).json({ error: "Todos os campos são obrigatórios" });
@@ -12,12 +12,20 @@ export const createRide = (db: Db) => async (req: Request, res: Response) => {
 
     const driverId = (req as any).user.userId;
 
+    const departureDate = new Date(date);
+    const arrivalDate = new Date(arrivalTime);
+
+    if (arrivalDate <= departureDate) {
+      return res.status(400).json({ error: "Hora de chegada deve ser depois da partida" });
+    }
+
     const newRide: IRide = {
       driver: new ObjectId(driverId),
       passengers: [],
       from,
       to,
-      date: new Date(date),
+      date: departureDate,
+      arrivalTime: arrivalDate,
       totalSeats,
       availableSeats: totalSeats,
       createdAt: new Date()

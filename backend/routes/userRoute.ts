@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registerUser, loginUser, googleAuthCallback } from "../controllers/userController";
+import { registerUser, loginUser, googleAuthCallback, rateUser } from "../controllers/userController";
 import { Db } from "mongodb";
 import passport from "passport";
 

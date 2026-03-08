@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongodb';
+import { Double, ObjectId } from 'mongodb';
 
 export interface IUser {
   _id?: ObjectId;      // ID gerado pelo MongoDB
