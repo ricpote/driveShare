@@ -75,6 +75,36 @@ function renderNextRide(ride) {
         color: "#136f63",
         weight: 4
       }).addTo(map);
+
+      if (ride.requests) {
+
+        ride.requests
+          .filter(r => r.status === "accepted")
+          .forEach(req => {
+
+            const pickup = [req.lat, req.lng];
+            const start = [ride.startLat, ride.startLng];
+            const FCT = [38.661, -9.204];
+
+            L.marker(pickup).addTo(map)
+              .bindPopup(`Pickup: ${req.name}`);
+
+            // origem -> pickup
+            L.polyline([start, pickup], {
+              color: "#ff7a00",
+              weight: 4
+            }).addTo(map);
+
+            // pickup -> FCT
+            L.polyline([pickup, FCT], {
+              color: "#136f63",
+              weight: 4,
+              dashArray: "6 6"
+            }).addTo(map);
+
+          });
+
+      }
     } catch(e) {
       console.warn("Não foi possível criar o mapa para esta boleia", e);
     }
@@ -86,26 +116,50 @@ function renderNextRide(ride) {
     rideCard.appendChild(noMapMsg);
   }
 
-  // PASSAGEIROS
+  // PASSAGEIROS / PEDIDOS
   const passengersDiv = document.createElement("div");
   passengersDiv.className = "ride-passengers";
+
+  const requests = ride.requests || [];
+
   passengersDiv.innerHTML = `
-    <h3 class="section-subtitle">Pedidos para entrar na boleia</h3>
-    <div id="ridePassengers-${ride.id}">
-      ${ride.passengers && ride.passengers.length
-        ? ride.passengers.map(p => `
-            <div class="passenger-card">
-              <span>${p.name}</span>
-              <div class="passenger-actions">
-                <button class="secondary-btn small-btn">Aceitar</button>
-                <button class="secondary-btn small-btn">Recusar</button>
-              </div>
-            </div>
-          `).join("")
-        : `<div class="empty-state">Ainda não há pedidos para esta boleia.</div>`
-      }
-    </div>
+  <h3 class="section-subtitle">Pedidos para entrar na boleia</h3>
+  <div id="ridePassengers-${ride.id}">
+  ${
+    requests.length
+      ? requests.map(req => `
+      <a href="profile.html?name=${req.name}&email=${req.email || ''}&phone=${req.phone || ''}" 
+      class="passenger-card" id="req-${req.id}">
+          <span>${req.name}</span>
+
+          <div class="passenger-actions">
+
+            ${
+              req.status === "accepted"
+              ? `<span class="accepted-badge">✓ Aceite</span>`
+              : `
+              <button class="secondary-btn small-btn accept-btn"
+                data-ride="${ride.id}"
+                data-req="${req.id}">
+                Aceitar
+              </button>
+
+              <button class="secondary-btn small-btn reject-btn"
+                data-ride="${ride.id}"
+                data-req="${req.id}">
+                Recusar
+              </button>
+              `
+            }
+
+          </div>
+        </a>
+      `).join("")
+      : `<div class="empty-state">Ainda não há pedidos para esta boleia.</div>`
+  }
+  </div>
   `;
+
   rideCard.appendChild(passengersDiv);
 }
 
@@ -185,3 +239,39 @@ if (logoutBtn) {
     window.location.href = "index.html";
   });
 }
+
+document.addEventListener("click", (e) => {
+
+  if(e.target.classList.contains("accept-btn") ||
+    e.target.classList.contains("reject-btn")){
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  const rideId = Number(e.target.dataset.ride);
+  const reqId = Number(e.target.dataset.req);
+
+  if (!rideId || !reqId) return;
+
+  const ride = rides.find(r => r.id === rideId);
+  if (!ride || !ride.requests) return;
+
+  const request = ride.requests.find(r => r.id === reqId);
+  if (!request) return;
+
+  if (e.target.classList.contains("accept-btn")) {
+    request.status = "accepted";
+
+    const card = document.getElementById(`req-${reqId}`);
+    const actions = card.querySelector(".passenger-actions");
+
+    actions.innerHTML = `<span class="accepted-badge">✓ Aceite</span>`;
+  }
+
+  if (e.target.classList.contains("reject-btn")) {
+    ride.requests = ride.requests.filter(r => r.id !== reqId);
+  }
+
+  localStorage.setItem(RIDES_KEY, JSON.stringify(rides));
+  location.reload();
+});

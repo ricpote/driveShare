@@ -801,3 +801,31 @@ gap:8px;
   border-radius: 8px;
   margin-bottom: 1rem;
 }
+
+.accepted-badge{
+  background:#2ecc71;
+  color:white;
+  padding:6px 12px;
+  border-radius:20px;
+  font-size:0.85rem;
+  font-weight:600;
+  display:inline-block;
+}
+
+.passenger-card{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  padding:10px;
+  border-radius:8px;
+
+  text-decoration:none;
+  color:inherit;
+
+  background:#f5f5f5;
+}
+
+.passenger-card:hover{
+  background:#ececec;
+}

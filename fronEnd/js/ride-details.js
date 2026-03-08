@@ -2,9 +2,7 @@ const SESSION_KEY = "uniride_current_user";
 const RIDES_KEY = "rides";
 
 const currentUser = JSON.parse(localStorage.getItem(SESSION_KEY));
-if (!currentUser) {
-  window.location.href = "index.html";
-}
+if (!currentUser) window.location.href = "index.html";
 
 const params = new URLSearchParams(window.location.search);
 const rideId = Number(params.get("id"));
@@ -61,59 +59,88 @@ if (!ride) {
 
     <div class="details-comment-box">
       <span class="info-label">Comentário do condutor</span>
-      <p>${ride.comment ? ride.comment : "Sem comentário adicional."}</p>
+      <p>${ride.comment || "Sem comentário adicional."}</p>
     </div>
 
-    <div style="margin-top:20px;">
+    <div class="ride-search-box" style="margin-bottom:10px;">
+      <input type="text" id="pickupSearch" placeholder="Procura a rua ou zona para ser apanhado" />
+      <button id="searchPickupBtn" class="secondary-btn map-search-btn">Encontrar</button>
+    </div>
+
+    <div id="rideMap" style="height:300px;margin-top:10px;border-radius:12px;"></div>
+
+    <div style="margin-top:10px;">
       <button id="requestRideBtn" class="primary-btn">Pedir boleia</button>
     </div>
-
-    <div id="rideMap" style="height:300px;margin-top:20px;border-radius:12px;"></div>
   `;
 }
 
+// ====== MAPA E PICKUP ======
 if (ride) {
-
   const map = L.map("rideMap").setView([ride.startLat, ride.startLng], 12);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "© OpenStreetMap" }).addTo(map);
 
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "© OpenStreetMap"
-  }).addTo(map);
+  const FCT = [38.661, -9.204];
+  L.marker([ride.startLat, ride.startLng]).addTo(map).bindPopup("Origem da boleia");
+  L.marker(FCT).addTo(map).bindPopup("FCT NOVA");
 
-  L.marker([ride.startLat, ride.startLng]).addTo(map);
-
-  L.polyline(
-    [
-      [ride.startLat, ride.startLng],
-      [38.661, -9.204]
-    ],
-    {
-      color: "#136f63",
-      weight: 4
-    }
-  ).addTo(map);
+  // Traço inicial do percurso
+  let routePolyline = L.polyline([[ride.startLat, ride.startLng], FCT], { color: "#136f63", weight: 4 }).addTo(map);
 
   let pickupMarker = null;
 
+  function updateRoute(lat, lng) {
+    if (routePolyline) map.removeLayer(routePolyline);
+    routePolyline = L.polyline([[lat, lng], FCT], { color: "#136f63", weight: 4 }).addTo(map);
+  }
+
   map.on("click", (e) => {
     const { lat, lng } = e.latlng;
-
-    if (pickupMarker) {
-      pickupMarker.setLatLng([lat, lng]);
-    } else {
-      pickupMarker = L.marker([lat, lng]).addTo(map);
+    if (pickupMarker) pickupMarker.setLatLng([lat, lng]);
+    else {
+      pickupMarker = L.marker([lat, lng]).addTo(map).bindPopup("Ponto de pickup").openPopup();
     }
+    updateRoute(lat, lng);
   });
 
+  // ===== BUSCA DE ORIGEM =====
+  const pickupSearch = document.getElementById("pickupSearch");
+  const searchBtn = document.getElementById("searchPickupBtn");
+
+  async function geocode(query) {
+    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}&countrycodes=pt`);
+    const data = await res.json();
+    if (!data.length) throw new Error("Local não encontrado");
+    return data[0];
+  }
+
+  async function searchPickup() {
+    const query = pickupSearch.value.trim();
+    if (!query) return alert("Escreve um local para procurar.");
+    try {
+      const result = await geocode(query);
+      const lat = Number(result.lat);
+      const lng = Number(result.lon);
+      if (pickupMarker) pickupMarker.setLatLng([lat, lng]);
+      else pickupMarker = L.marker([lat, lng]).addTo(map).bindPopup("Ponto de pickup").openPopup();
+      map.setView([lat, lng], 14);
+      updateRoute(lat, lng);
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  searchBtn.addEventListener("click", searchPickup);
+  pickupSearch.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); searchPickup(); } });
+
+  // ===== PEDIDO DE BOLEIA =====
   const requestBtn = document.getElementById("requestRideBtn");
 
   requestBtn.addEventListener("click", () => {
-
     if (!pickupMarker) {
-      alert("Escolhe no mapa onde queres ser apanhado.");
+      alert("Escolhe no mapa onde queres ser apanhado ou pesquisa a rua.");
       return;
     }
-
     const { lat, lng } = pickupMarker.getLatLng();
 
     if (!ride.requests) ride.requests = [];
@@ -128,8 +155,6 @@ if (ride) {
     });
 
     localStorage.setItem(RIDES_KEY, JSON.stringify(rides));
-
     alert("Pedido enviado ao condutor.");
   });
-
 }
