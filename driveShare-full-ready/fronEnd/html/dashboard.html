@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UniRide | Dashboard</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <h1>Dashboard</h1>
+        <p id="welcomeText">Bem-vindo ao UniRide</p>
+      </div>
+      <div class="topbar-actions">
+        <a href="rides.html"><button class="secondary-btn">Ver boleias</button></a>
+        <a href="account.html"><button class="secondary-btn">Conta</button></a>
+        <button id="logoutBtn" class="primary-btn topbar-btn">Logout</button>
+      </div>
+    </header>
+
+    <section class="dashboard-grid dashboard-grid-wide">
+      <div class="card">
+        <h2 class="page-title">Criar boleia</h2>
+        <div id="rideMessage" class="message hidden"></div>
+
+        <form id="rideForm" class="styled-form">
+          <label for="origin">Origem</label>
+          <div class="input-with-suggestions">
+            <input type="text" id="origin" placeholder="Ex: Almada" required />
+            <div id="originSuggestions" class="suggestions hidden"></div>
+          </div>
+          <input type="hidden" id="fromLat" />
+          <input type="hidden" id="fromLng" />
+
+          <label for="destination">Destino</label>
+          <div class="input-with-suggestions">
+            <input type="text" id="destination" value="FCT NOVA, Caparica" required />
+            <div id="destinationSuggestions" class="suggestions hidden"></div>
+          </div>
+          <input type="hidden" id="toLat" value="38.661089" />
+          <input type="hidden" id="toLng" value="-9.204401" />
+
+          <label for="rideDate">Data</label>
+          <input type="date" id="rideDate" required />
+
+          <label for="time">Hora de partida</label>
+          <input type="time" id="time" required />
+
+          <label for="seats">Lugares disponíveis</label>
+          <input type="number" id="seats" min="1" max="8" placeholder="Ex: 3" required />
+
+          <div class="map-mode">
+            <span>Ao clicar no mapa estás a definir:</span>
+            <label><input type="radio" name="mapPointMode" value="origin" checked /> Origem</label>
+            <label><input type="radio" name="mapPointMode" value="destination" /> Destino</label>
+          </div>
+
+          <button type="submit" class="primary-btn">Guardar boleia</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2 class="page-title">Mapa e impacto</h2>
+        <div id="rideMap" class="leaflet-map"></div>
+        <p class="helper-text">Podes procurar uma morada, escolher nas sugestões ou clicar no mapa para preencher origem e destino.</p>
+        <div class="stats">
+          <div class="stat">
+            <strong id="totalRides">0</strong>
+            <span>Boleias criadas</span>
+          </div>
+          <div class="stat">
+            <strong id="totalSeats">0</strong>
+            <span>Lugares disponíveis</span>
+          </div>
+          <div class="stat">
+            <strong id="co2Saved">0 kg</strong>
+            <span>CO₂ estimado poupado</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="../js/main.js"></script>
+</body>
+</html>

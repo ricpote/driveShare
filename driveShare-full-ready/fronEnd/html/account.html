@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UniRide | Conta</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <h1>Conta</h1>
+        <p>Resumo da tua atividade e gestão de pedidos.</p>
+      </div>
+      <div class="topbar-actions">
+        <a href="dashboard.html"><button class="secondary-btn">Dashboard</button></a>
+        <a href="rides.html"><button class="secondary-btn">Boleias</button></a>
+        <button id="logoutBtn" class="primary-btn topbar-btn">Logout</button>
+      </div>
+    </header>
+
+    <div id="accountMessage" class="message hidden"></div>
+
+    <section class="dashboard-grid dashboard-grid-wide">
+      <div class="card">
+        <h2 class="page-title">Perfil</h2>
+        <div class="profile-block">
+          <strong id="profileName">Utilizador</strong>
+          <span id="profileEmail"></span>
+        </div>
+      </div>
+      <div class="card">
+        <h2 class="page-title">Pedidos pendentes nas tuas boleias</h2>
+        <div id="requestsContainer"></div>
+      </div>
+    </section>
+
+    <section class="dashboard-grid dashboard-grid-wide account-sections">
+      <div class="card list-card">
+        <h2 class="page-title">As tuas boleias</h2>
+        <div id="myRidesContainer"></div>
+      </div>
+      <div class="card list-card">
+        <h2 class="page-title">Boleias em que participas</h2>
+        <div id="joinedRidesContainer"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="../js/main.js"></script>
+  <script src="../js/account.js"></script>
+</body>
+</html>

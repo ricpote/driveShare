@@ -1,0 +1,803 @@
+:root {
+  --bg: #f4f7f6;
+  --surface: #ffffff;
+  --primary: #136f63;
+  --primary-dark: #0f5a51;
+  --text: #14213d;
+  --muted: #667085;
+  --border: #d9e2e7;
+  --danger: #c62828;
+  --success: #1b8f4d;
+  --shadow: 0 20px 40px rgba(19, 111, 99, 0.12);
+}
+
+.pickup-marker {
+  background: #ff7a00;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.page {
+  min-height: 100vh;
+}
+
+.auth-page {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+}
+
+.brand-panel {
+  background: linear-gradient(145deg, #136f63, #1d9b8a);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+}
+
+.brand-content {
+  max-width: 480px;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.brand-content h1 {
+  font-size: 56px;
+  margin: 10px 0 16px;
+}
+
+.lead {
+  font-size: 20px;
+  line-height: 1.5;
+  margin-bottom: 30px;
+}
+
+.brand-points {
+  display: grid;
+  gap: 14px;
+}
+
+.point {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+
+.auth-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+
+.auth-card,
+.card {
+  width: 100%;
+  max-width: 460px;
+  background: var(--surface);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  padding: 28px;
+}
+
+.mapcard {
+  width: 100%;
+  max-width: 700px;
+  background: var(--surface);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  padding: 28px;
+}
+
+.rides-layout {
+  display: flex;
+  gap: 20px;
+}
+
+.rides-layout .card {
+  flex: 1;
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #eef4f3;
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 18px;
+}
+
+.tab {
+  border: none;
+  background: transparent;
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: bold;
+  color: var(--muted);
+}
+
+.tab.active {
+  background: white;
+  color: var(--primary);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+.auth-form,
+.styled-form {
+  display: none;
+  text-align: left;
+}
+
+.auth-form.active,
+.styled-form.active,
+.styled-form {
+  display: block;
+}
+
+.auth-form h2,
+.page-title {
+  margin-top: 6px;
+  margin-bottom: 18px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+input {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 16px;
+  font-size: 15px;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.primary-btn,
+.secondary-btn,
+.inline-btn {
+  border: none;
+  cursor: pointer;
+  border-radius: 12px;
+  padding: 13px 16px;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.primary-btn {
+  width: 100%;
+  background: var(--primary);
+  color: white;
+}
+
+.primary-btn:hover,
+.inline-btn:hover {
+  background: var(--primary-dark);
+}
+
+.secondary-btn {
+  background: #e8f2f0;
+  color: var(--primary);
+}
+
+.inline-btn {
+  background: var(--primary);
+  color: white;
+  width: auto;
+}
+
+.helper-text {
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.message {
+  padding: 12px 14px;
+  border-radius: 12px;
+  margin-bottom: 18px;
+  font-size: 14px;
+}
+
+.message.error {
+  background: #fdecec;
+  color: var(--danger);
+}
+
+.message.success {
+  background: #e9f8ef;
+  color: var(--success);
+}
+
+.hidden {
+  display: none;
+}
+
+.app-shell {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 20px 48px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.topbar h1 {
+  margin: 0;
+}
+
+.topbar p {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.topbar-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.stat {
+  background: #f6faf9;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.stat strong {
+  display: block;
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.list-card {
+  display: grid;
+  gap: 14px;
+}
+
+.ride-card {
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  background: white;
+}
+
+.ride-card h3 {
+  margin: 0 0 8px;
+}
+
+.ride-meta {
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--muted);
+  padding: 24px;
+  border: 1px dashed var(--border);
+  border-radius: 16px;
+}
+
+@media (max-width: 900px) {
+
+  .auth-page,
+  .dashboard-grid,
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .brand-panel {
+    min-height: 280px;
+  }
+
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+#map {
+  height: 350px;
+  width: 100%;
+  border-radius: 16px;
+  margin-bottom: 20px;
+}
+
+#createRideMap,
+#map {
+  height: 360px;
+  width: 100%;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.ride-card {
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  background: white;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
+}
+
+.ride-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(19, 111, 99, 0.08);
+}
+
+.ride-card-active {
+  border-color: var(--primary);
+  box-shadow: 0 14px 28px rgba(19, 111, 99, 0.16);
+}
+
+.ride-marker,
+.pickup-marker {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--primary);
+  border: 3px solid white;
+  box-shadow: 0 6px 18px rgba(19, 111, 99, 0.35);
+}
+
+.ride-marker.active {
+  width: 22px;
+  height: 22px;
+  background: #0f5a51;
+  box-shadow: 0 8px 24px rgba(19, 111, 99, 0.45);
+}
+
+.campus-marker {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  background: #14213d;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: bold;
+  border: 3px solid white;
+  box-shadow: 0 8px 24px rgba(20, 33, 61, 0.28);
+}
+
+
+@media (max-width: 900px) {
+
+  .dashboard-grid,
+  .rides-layout {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+
+  .mapcard,
+  .rides-layout .card,
+  .card {
+    max-width: 100%;
+  }
+
+  .topbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .topbar-actions {
+    flex-direction: column;
+  }
+
+  .account-grid {
+    align-items: start;
+  }
+
+  .account-main-card {
+    max-width: 100%;
+  }
+
+  .account-user-block {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .section-subtitle {
+    margin: 0 0 16px;
+    font-size: 18px;
+  }
+
+  .user-info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  .info-item {
+    background: #f6faf9;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+  }
+
+  .info-label {
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .info-item strong {
+    font-size: 16px;
+    word-break: break-word;
+  }
+
+  #activeRides,
+  #rideHistory {
+    display: grid;
+    gap: 14px;
+  }
+
+  @media (max-width: 900px) {
+    .user-info-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+textarea {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 16px;
+  font-size: 15px;
+  resize: vertical;
+  font-family: Arial, sans-serif;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.topbar-primary {
+  width: auto;
+}
+
+.dashboard-shell {
+  max-width: 1200px;
+}
+
+.dashboard-single {
+  display: flex;
+  justify-content: center;
+}
+
+.wide-card {
+  max-width: 860px;
+  width: 100%;
+}
+
+.ride-form-card {
+  padding: 32px;
+}
+
+.form-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.two-columns {
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+}
+
+.helper-text-tight {
+  margin-top: 10px;
+  margin-bottom: 18px;
+}
+
+.ride-comment-preview {
+  color: var(--muted);
+  line-height: 1.45;
+  min-height: 44px;
+}
+
+.details-card {
+  max-width: 860px;
+  width: 100%;
+}
+
+.ride-details-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.ride-details-header h2 {
+  margin: 6px 0 0;
+}
+
+.details-eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.details-badge {
+  background: #e8f2f0;
+  color: var(--primary);
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-weight: bold;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.details-panel {
+  background: #f8fbfa;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+}
+
+.contact-item + .contact-item {
+  margin-top: 14px;
+}
+
+.details-comment-box {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  background: #fff;
+}
+
+.details-comment-box p {
+  margin: 8px 0 0;
+  line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+  .two-columns,
+  .details-grid,
+  .dashboard-grid,
+  .rides-layout {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+
+  .topbar-actions {
+    flex-direction: column;
+  }
+
+  .ride-details-header {
+    flex-direction: column;
+  }
+
+  .wide-card,
+  .details-card {
+    max-width: 100%;
+  }
+}
+
+
+.form-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.form-grid.two-columns {
+  grid-template-columns: 1fr 1fr;
+}
+
+.form-grid.align-end {
+  align-items: end;
+}
+
+.origin-input-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.origin-input-row input {
+  margin-bottom: 0;
+}
+
+.map-search-btn {
+  width: auto;
+  white-space: nowrap;
+}
+
+.helper-text-tight {
+  margin-top: 8px;
+}
+
+@media (max-width: 900px) {
+  .form-grid.two-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .origin-input-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .map-search-btn {
+    width: 100%;
+  }
+}
+
+.account-layout {
+  display: grid;
+  gap: 24px;
+}
+
+.rides-active-card {
+  padding-bottom: 24px;
+}
+
+#rideMap {
+  height: 320px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+
+.ride-passengers {
+  margin-top: 10px;
+}
+
+.passenger-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  background: #f9fbfb;
+}
+
+.passenger-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.small-btn {
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+.passenger-card{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:12px;
+border:1px solid var(--border);
+border-radius:10px;
+margin-bottom:10px;
+}
+
+.passenger-actions{
+display:flex;
+gap:8px;
+}
+
+.account-page .card {
+  max-width: none;
+  width: 100%;
+}
+
+.account-page .account-layout {
+  width: 100%;
+}
+
+#rideMap {
+  height: 400px;
+  width: 100%;
+  border-radius: 10px;
+  margin-top: 16px;
+}
+
+/* Container vertical: Data/Hora em cima, Origem em baixo */
+.vertical-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Linha com Data e Hora lado a lado */
+.datetime-row {
+  display: flex;
+  gap: 12px;
+}
+
+.datetime-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Origem ocupa toda a largura */
+.origin-row {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Responsivo: mobile empilha Data/Hora */
+@media (max-width: 768px) {
+  .datetime-row {
+    flex-direction: column;
+  }
+}
+
+#rideMap {
+  width: 100%;
+  height: 300px; /* ou 400px se quiseres maior */
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
