@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,6 +8,7 @@
   <link rel="stylesheet" href="../css/styles.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 </head>
+
 <body>
   <main class="app-shell dashboard-shell">
     <header class="topbar">
@@ -14,10 +16,11 @@
         <h1>Dashboard</h1>
         <p id="welcomeText">Bem-vindo ao UniRide</p>
       </div>
+
       <div class="topbar-actions">
-        <a href="rides.html"><button class="secondary-btn">Ver boleias</button></a>
-        <a href="account.html"><button class="secondary-btn">Conta</button></a>
-        
+        <a href="rides.html"><button type="button" class="secondary-btn">Ver boleias</button></a>
+        <a href="account.html"><button type="button" class="secondary-btn">Conta</button></a>
+        <button type="button" id="logoutBtn" class="secondary-btn">Terminar sessão</button>
       </div>
     </header>
 
@@ -28,32 +31,54 @@
 
         <form id="rideForm" class="styled-form">
           <div class="form-grid vertical-layout">
-            <!-- Linha superior: Data e Hora lado a lado -->
             <div class="datetime-row">
               <div class="datetime-item">
-                <label for="date">Data</label>
+                <label for="date">Data da partida</label>
                 <input type="date" id="date" required />
               </div>
+
               <div class="datetime-item">
-                <label for="time">Hora</label>
+                <label for="time">Hora da partida</label>
                 <input type="time" id="time" required />
               </div>
             </div>
 
-            <!-- Linha inferior: Origem -->
+            <div class="datetime-row">
+              <div class="datetime-item">
+                <label for="arrivalDate">Data de chegada</label>
+                <input type="date" id="arrivalDate" required />
+              </div>
+
+              <div class="datetime-item">
+                <label for="arrivalTime">Hora de chegada</label>
+                <input type="time" id="arrivalTime" required />
+              </div>
+            </div>
+
             <div class="origin-row">
               <label for="origin">Origem</label>
               <div class="origin-input-row">
                 <input type="text" id="origin" placeholder="Ex: Corroios ou Rua da Liberdade, Almada" required />
-                <button type="button" id="findOriginBtn" class="secondary-btn map-search-btn">Encontrar no mapa</button>
+                <button type="button" id="findOriginBtn" class="secondary-btn map-search-btn">
+                  Encontrar no mapa
+                </button>
               </div>
-              <p class="helper-text helper-text-tight">Escreve uma zona, rua ou local e carrega em “Encontrar no mapa”.</p>
+              <p class="helper-text helper-text-tight">
+                Escreve uma zona, rua ou local e carrega em “Encontrar no mapa”.
+              </p>
+            </div>
+
+            <div class="origin-row">
+              <label for="destination">Destino</label>
+              <input type="text" id="destination" placeholder="Ex: FCT NOVA" required />
             </div>
           </div>
 
           <label>Ponto de partida no mapa</label>
           <div id="createRideMap"></div>
-          <p class="helper-text helper-text-tight">Clica no mapa para marcar o ponto de partida da boleia ou pesquisa a origem pelo nome.</p>
+          <p class="helper-text helper-text-tight">
+            Clica no mapa para marcar o ponto de partida da boleia ou pesquisa a origem pelo nome.
+          </p>
 
           <input type="hidden" id="startLat" />
           <input type="hidden" id="startLng" />
@@ -66,7 +91,8 @@
 
             <div>
               <label for="rideComment">Comentário</label>
-              <textarea id="rideComment" rows="4" placeholder="Ex: Passo pela estação de Corroios, posso esperar 5 minutos."></textarea>
+              <textarea id="rideComment" rows="4"
+                placeholder="Ex: Passo pela estação de Corroios, posso esperar 5 minutos."></textarea>
             </div>
           </div>
 
@@ -77,6 +103,7 @@
   </main>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="../js/main.js"></script>
+  <script src="../js/dashboard.js"></script>
 </body>
+
 </html>

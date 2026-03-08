@@ -1,20 +1,17 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UniRide | Boleias</title>
 
   <link rel="stylesheet" href="../css/styles.css" />
-
-
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 </head>
 
 <body>
-
   <main class="app-shell">
-
     <header class="topbar">
       <div>
         <h1>Boleias disponíveis</h1>
@@ -22,35 +19,34 @@
       </div>
 
       <div class="topbar-actions">
-        <a href="dashboard.html">
-          <button class="secondary-btn">Dashboard</button>
-        </a>
-
-        <a href="account.html">
-          <button class="primary-btn">Conta</button>
-        </a>
+        <a href="dashboard.html" class="secondary-btn nav-btn">Dashboard</a>
+        <a href="account.html" class="secondary-btn nav-btn">Conta</a>
+        <button type="button" id="logoutBtn" class="secondary-btn">Terminar sessão</button>
       </div>
     </header>
 
     <div class="rides-layout">
-
       <section class="mapcard">
-        <h2 class="page-title">Mapa de boleias</h2>
+        <div class="section-top">
+          <h2 class="page-title">Mapa de boleias</h2>
+        </div>
         <div id="map"></div>
       </section>
 
       <section class="card list-card">
-        <h2 class="page-title">Lista de boleias</h2>
+        <div class="section-top">
+          <h2 class="page-title">Lista de boleias</h2>
+          <button type="button" id="refreshRidesBtn" class="primary-btn">Atualizar</button>
+        </div>
+
+        <div id="ridesMessage" class="message hidden"></div>
         <div id="ridesContainer"></div>
       </section>
-
     </div>
-
   </main>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
   <script src="../js/rides.js"></script>
-
 </body>
+
 </html>

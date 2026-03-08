@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UniRide | Login</title>
   <link rel="stylesheet" href="../css/styles.css" />
 </head>
+
 <body>
   <div class="page auth-page">
     <div class="brand-panel">
@@ -41,6 +43,10 @@
           <input type="password" id="loginPassword" placeholder="••••••••" required />
 
           <button type="submit" class="primary-btn">Entrar</button>
+
+          <button type="button" id="googleLoginBtn" class="secondary-btn">
+            Entrar com conta institucional Google
+          </button>
         </form>
 
         <form id="registerForm" class="auth-form">
@@ -64,7 +70,7 @@
         </form>
 
         <p class="helper-text">
-          Os dados ficam guardados localmente no browser para depois ligares ao backend.
+          Usa o teu email institucional para entrar ou criar conta.
         </p>
       </div>
     </div>
@@ -72,4 +78,5 @@
 
   <script src="../js/main.js"></script>
 </body>
+
 </html>

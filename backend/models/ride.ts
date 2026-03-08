@@ -1,14 +1,19 @@
 import { ObjectId } from 'mongodb';
 
 export interface IRide {
-  _id?: ObjectId;           // ID gerado pelo MongoDB
-  driver: ObjectId;         // ID do motorista
-  passengers: ObjectId[];   // IDs dos passageiros
-  from: string;             // Local de partida
-  to: string;               // Destino
-  date: Date;               // Data/hora da boleia
+  _id?: ObjectId;
+  driver: ObjectId;
+  passengers: ObjectId[];
+  from: string;
+  to: string;
+  date: Date;
   arrivalTime: Date;
   totalSeats: number;
-  availableSeats: number;   // Lugares disponíveis
-  createdAt?: Date; 
+  availableSeats: number;
+  comment?: string;
+  startLocation?: {
+    lat: number;
+    lng: number;
+  };
+  createdAt?: Date;
 }

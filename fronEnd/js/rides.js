@@ -1,142 +1,269 @@
-const container = document.getElementById("ridesContainer");
-const rides = JSON.parse(localStorage.getItem("rides")) || [];
+const API_RIDES_URL = "http://localhost:5000/api/rides";
 
-const FCT = {
-  lat: 38.661,
-  lng: -9.204
-};
+const ridesContainer = document.getElementById("ridesContainer");
+const ridesMessage = document.getElementById("ridesMessage");
+const logoutBtn = document.getElementById("logoutBtn");
+const refreshRidesBtn = document.getElementById("refreshRidesBtn");
 
-const map = L.map("map").setView([FCT.lat, FCT.lng], 11);
+let map;
+let markersLayer;
 
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  attribution: "© OpenStreetMap"
-}).addTo(map);
+function showMessage(text, type = "error") {
+  if (!ridesMessage) return;
+  ridesMessage.textContent = text;
+  ridesMessage.classList.remove("hidden", "error", "success");
+  ridesMessage.classList.add(type);
+}
 
-const campusIcon = L.divIcon({
-  className: "campus-marker-wrapper",
-  html: `<div class="campus-marker">FCT</div>`,
-  iconSize: [42, 42],
-  iconAnchor: [21, 21]
-});
+function hideMessage() {
+  if (!ridesMessage) return;
+  ridesMessage.textContent = "";
+  ridesMessage.classList.add("hidden");
+  ridesMessage.classList.remove("error", "success");
+}
 
-const rideIcon = L.divIcon({
-  className: "ride-marker-wrapper",
-  html: `<div class="ride-marker"></div>`,
-  iconSize: [22, 22],
-  iconAnchor: [11, 11]
-});
+function getToken() {
+  return localStorage.getItem("token");
+}
 
-const activeRideIcon = L.divIcon({
-  className: "ride-marker-wrapper",
-  html: `<div class="ride-marker active"></div>`,
-  iconSize: [26, 26],
-  iconAnchor: [13, 13]
-});
+function requireAuth() {
+  const token = getToken();
 
-L.marker([FCT.lat, FCT.lng], { icon: campusIcon })
-  .addTo(map)
-  .bindPopup("<b>FCT NOVA</b><br>Destino das boleias");
+  if (!token) {
+    window.location.href = "./index.html";
+    return null;
+  }
 
-const rideEntries = [];
+  return token;
+}
 
-if (!rides.length) {
-  container.innerHTML = '<div class="empty-state">Ainda não existem boleias criadas.</div>';
-} else {
-  rides
-    .sort((a, b) => String(a.time).localeCompare(String(b.time)))
-    .forEach((ride) => {
-      const card = document.createElement("article");
-      card.className = "ride-card";
+function parseJwt(token) {
+  try {
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map((char) => "%" + ("00" + char.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    );
 
-      card.innerHTML = `
-        <h3>${ride.origin} → ${ride.destination}</h3>
-        <div class="ride-meta">${ride.driverName} · Destino: FCT NOVA</div>
-        <p>Hora de partida: <strong>${ride.time}</strong></p>
-        <p>Lugares disponíveis: <strong>${ride.seats}</strong></p>
-        ${ride.comment ? `<p class="ride-comment-preview">${ride.comment}</p>` : ""}
-        <button class="inline-btn" data-ride-id="${ride.id}">Pedir boleia</button>
-      `;
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error("Erro ao ler token:", error);
+    return null;
+  }
+}
 
-      container.appendChild(card);
+function getCurrentUserId() {
+  const token = getToken();
+  if (!token) return null;
 
-      if (ride.startLat && ride.startLng) {
-        const marker = L.marker([ride.startLat, ride.startLng], { icon: rideIcon }).addTo(map);
+  const decoded = parseJwt(token);
+  return decoded?.userId || null;
+}
 
-        const route = L.polyline(
-          [
-            [ride.startLat, ride.startLng],
-            [FCT.lat, FCT.lng]
-          ],
-          {
-            color: "#136f63",
-            weight: 4,
-            opacity: 0.35,
-            dashArray: "8 8"
-          }
-        ).addTo(map);
+function formatDate(dateString) {
+  const date = new Date(dateString);
 
-        marker.bindPopup(`
-          <b>${ride.driverName}</b><br>
-          ${ride.origin} → ${ride.destination}<br>
-          Hora: ${ride.time}<br>
-          Lugares: ${ride.seats}
+  return date.toLocaleString("pt-PT", {
+    dateStyle: "short",
+    timeStyle: "short"
+  });
+}
+
+function initMap() {
+  const mapElement = document.getElementById("map");
+  if (!mapElement) return;
+
+  map = L.map("map").setView([38.661, -9.205], 11);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "&copy; OpenStreetMap contributors"
+  }).addTo(map);
+
+  markersLayer = L.layerGroup().addTo(map);
+}
+
+function renderMapMarkers(rides) {
+  if (!markersLayer) return;
+
+  markersLayer.clearLayers();
+
+  rides.forEach((ride) => {
+    if (
+      ride.startLocation &&
+      typeof ride.startLocation.lat === "number" &&
+      typeof ride.startLocation.lng === "number"
+    ) {
+      L.marker([ride.startLocation.lat, ride.startLocation.lng])
+        .addTo(markersLayer)
+        .bindPopup(`
+          <strong>${ride.from} → ${ride.to}</strong><br>
+          Partida: ${formatDate(ride.date)}
         `);
+    }
+  });
+}
 
-        rideEntries.push({ card, marker, route, ride });
+function getCurrentPosition() {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error("A geolocalização não é suportada neste browser."));
+      return;
+    }
 
-        card.addEventListener("click", (event) => {
-          if (event.target.matches(".inline-btn")) return;
-          focusRide(card, marker, ride);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        resolve({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
         });
+      },
+      () => {
+        reject(new Error("Não foi possível obter a tua localização."));
+      }
+    );
+  });
+}
 
-        card.addEventListener("mouseenter", () => focusRide(card, marker, ride, true));
+async function requestToJoinRide(rideId) {
+  hideMessage();
+
+  const token = requireAuth();
+  if (!token) return;
+
+  try {
+    showMessage("A obter localização...", "success");
+
+    const location = await getCurrentPosition();
+
+    const response = await fetch(`${API_RIDES_URL}/${rideId}/request`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        lat: location.lat,
+        lng: location.lng
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        localStorage.removeItem("token");
+        window.location.href = "./index.html";
+        return;
+      }
+
+      showMessage(data.error || "Erro ao pedir entrada.");
+      return;
+    }
+
+    showMessage("Pedido enviado ao condutor.", "success");
+  } catch (error) {
+    console.error("Erro ao pedir entrada:", error);
+    showMessage(error.message || "Não foi possível enviar o pedido.");
+  }
+}
+
+function renderRides(rides) {
+  if (!ridesContainer) return;
+
+  ridesContainer.innerHTML = "";
+
+  if (!rides.length) {
+    ridesContainer.innerHTML = `<p class="helper-text">Não existem boleias disponíveis de momento.</p>`;
+    return;
+  }
+
+  const currentUserId = String(getCurrentUserId());
+
+  rides.forEach((ride) => {
+    const rideCard = document.createElement("div");
+    rideCard.className = "ride-card";
+
+    const rideDriverId = String(ride.driver);
+    const isMyRide = currentUserId && rideDriverId === currentUserId;
+
+    rideCard.innerHTML = `
+      <h3>${ride.from} → ${ride.to}</h3>
+      <p><strong>Partida:</strong> ${formatDate(ride.date)}</p>
+      <p><strong>Chegada:</strong> ${formatDate(ride.arrivalTime)}</p>
+      <p><strong>Lugares disponíveis:</strong> ${ride.availableSeats} / ${ride.totalSeats}</p>
+      ${isMyRide
+        ? `<p class="helper-text"><strong>Esta é a tua boleia.</strong></p>`
+        : `<button type="button" class="primary-btn join-ride-btn" data-ride-id="${ride._id}">Pedir entrada</button>`
+      }
+    `;
+
+    ridesContainer.appendChild(rideCard);
+  });
+
+  document.querySelectorAll(".join-ride-btn").forEach((button) => {
+    button.addEventListener("click", () => {
+      const rideId = button.dataset.rideId;
+      requestToJoinRide(rideId);
+    });
+  });
+}
+
+async function loadRides() {
+  hideMessage();
+
+  if (ridesContainer) {
+    ridesContainer.innerHTML = `<p class="helper-text">A carregar boleias...</p>`;
+  }
+
+  const token = requireAuth();
+  if (!token) return;
+
+  try {
+    const response = await fetch(API_RIDES_URL, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
       }
     });
 
-  container.addEventListener("click", (event) => {
-    if (event.target.matches(".inline-btn")) {
-      event.stopPropagation();
-      const rideId = event.target.dataset.rideId;
-      window.location.href = `ride-details.html?id=${rideId}`;
+    const data = await response.json();
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        localStorage.removeItem("token");
+        window.location.href = "./index.html";
+        return;
+      }
+
+      if (ridesContainer) ridesContainer.innerHTML = "";
+      showMessage(data.error || "Erro ao carregar boleias.");
+      return;
     }
-  });
 
-  const allMarkers = rideEntries.map((entry) => entry.marker);
-  if (allMarkers.length) {
-    const group = L.featureGroup([
-      ...allMarkers,
-      L.marker([FCT.lat, FCT.lng])
-    ]);
-    map.fitBounds(group.getBounds().pad(0.2));
+    renderRides(data);
+    renderMapMarkers(data);
+  } catch (error) {
+    console.error("Erro ao carregar boleias:", error);
+    if (ridesContainer) ridesContainer.innerHTML = "";
+    showMessage("Não foi possível ligar ao servidor.");
   }
 }
 
-function focusRide(card, marker, ride, soft = false) {
-  rideEntries.forEach((entry) => {
-    entry.card.classList.remove("ride-card-active");
-    entry.marker.setIcon(rideIcon);
-    entry.route.setStyle({
-      opacity: 0.25,
-      weight: 4
-    });
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", () => {
+    localStorage.removeItem("token");
+    window.location.href = "./index.html";
   });
-
-  card.classList.add("ride-card-active");
-  marker.setIcon(activeRideIcon);
-
-  const current = rideEntries.find((entry) => entry.marker === marker);
-  if (current) {
-    current.route.setStyle({
-      opacity: 0.8,
-      weight: 5
-    });
-  }
-
-  map.flyTo([ride.startLat, ride.startLng], soft ? 12 : 13, {
-    duration: 0.8
-  });
-
-  marker.openPopup();
 }
 
+if (refreshRidesBtn) {
+  refreshRidesBtn.addEventListener("click", loadRides);
+}
 
+requireAuth();
+initMap();
+loadRides();
