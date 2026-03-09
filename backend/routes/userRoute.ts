@@ -19,24 +19,15 @@ export default function userRoutes(db: Db) {
   router.post("/register", registerUser(db));
   router.post("/login", loginUser(db));
 
-  // Rating
-  router.post("/rate", authMiddleware, rateUser(db));
-
-  // Utilizador autenticado
-  router.get("/me", authMiddleware, getMe(db));
-  router.put("/me", authMiddleware, updateMe(db));
-
-  // Ver perfil de outro utilizador
-  router.get("/:userId", authMiddleware, getUserById(db));
-
-  // --- OAUTH ---
+  // --- OAUTH --- (must be before /:userId wildcard)
 
   // 1. Inicia o fluxo do Google
   router.get(
     "/auth/google",
     passport.authenticate("google", {
       scope: ["profile", "email"],
-      hd: "campus.fct.unl.pt"
+      hd: "campus.fct.unl.pt",
+      prompt: "select_account"
     })
   );
 
@@ -49,6 +40,16 @@ export default function userRoutes(db: Db) {
     }),
     googleAuthCallback(db)
   );
+
+  // Rating
+  router.post("/rate", authMiddleware, rateUser(db));
+
+  // Utilizador autenticado
+  router.get("/me", authMiddleware, getMe(db));
+  router.put("/me", authMiddleware, updateMe(db));
+
+  // Ver perfil de outro utilizador
+  router.get("/:userId", authMiddleware, getUserById(db));
 
   return router;
 }

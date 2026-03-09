@@ -117,7 +117,7 @@ export const googleAuthCallback = (db: Db) => async (req: Request, res: Response
       { expiresIn: "1h" }
     );
 
-    res.redirect(`http://localhost:5500/pages/dashboard.html?token=${token}`);
+    res.redirect(`/dashboard.html?token=${token}`);
   } catch (err) {
     console.error("Erro no Google Callback:", err);
     res.redirect("/index.html?error=server_error");
