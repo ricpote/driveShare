@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UniRide | Conta</title>
   <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 </head>
 
 <body>
@@ -16,9 +18,9 @@
       </div>
 
       <div class="topbar-actions">
-        <a href="dashboard.html" class="secondary-btn nav-btn">Dashboard</a>
-        <a href="rides.html" class="secondary-btn nav-btn">Boleias</a>
-        <button id="logoutBtn" class="primary-btn topbar-primary" type="button">Logout</button>
+        <a href="dashboard.html" class="secondary-btn nav-btn">Marcar Viagem</a>
+        <a href="rides.html" class="secondary-btn nav-btn">Viagens</a>
+        <button id="logoutBtn" class="primary-btn topbar-primary" type="button">Terminar sessão</button>
       </div>
     </header>
 
@@ -50,8 +52,8 @@
           </div>
 
           <div class="stat">
-            <strong id="totalSeats">0</strong>
-            <span>Lugares disponíveis</span>
+            <strong id="userRating">—</strong>
+            <span>Rating médio</span>
           </div>
 
           <div class="stat">
@@ -81,17 +83,34 @@
               <span class="info-label">Telemóvel</span>
               <strong id="userPhone">—</strong>
             </div>
-
-            <div class="info-item">
-              <span class="info-label">ID de utilizador</span>
-              <strong id="userId">—</strong>
-            </div>
           </div>
+
+          <form id="editUserForm" class="account-edit-form" style="display: none; margin-top: 1rem;">
+            <div class="user-info-grid">
+              <div class="info-item">
+                <label class="info-label" for="editName">Nome</label>
+                <input id="editName" name="name" type="text" class="auth-input" placeholder="O teu nome" required />
+              </div>
+
+              <div class="info-item">
+                <label class="info-label" for="editPhone">Telemóvel</label>
+                <input id="editPhone" name="phone" type="text" class="auth-input" placeholder="O teu telemóvel"
+                  required />
+              </div>
+            </div>
+
+            <div class="topbar-actions" style="margin-top: 1rem; justify-content: flex-start;">
+              <button id="saveUserBtn" type="submit" class="primary-btn small-btn">Guardar</button>
+              <button id="cancelEditUserBtn" type="button" class="secondary-btn small-btn">Cancelar</button>
+            </div>
+          </form>
         </div>
       </div>
     </section>
   </main>
 
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="../js/account.js"></script>
 </body>
+
 </html>

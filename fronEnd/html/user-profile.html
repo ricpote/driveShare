@@ -1,60 +1,39 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>UniRide | Conta</title>
+  <title>UniRide | Perfil do utilizador</title>
   <link rel="stylesheet" href="../css/styles.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 </head>
 
 <body>
   <main class="app-shell account-page">
-
     <header class="topbar">
       <div>
-        <h1>A minha conta</h1>
-        <p>Consulta os teus dados e atividade no UniRide.</p>
+        <h1>Perfil do utilizador</h1>
+        <p>Consulta os dados deste utilizador.</p>
       </div>
 
       <div class="topbar-actions">
-        <a href="account.html">
-          <button class="secondary-btn">Voltar</button>
-        </a>
+        <a href="account.html" class="secondary-btn nav-btn">Voltar</a>
       </div>
     </header>
 
     <section class="account-layout">
-
-      <!-- HISTÓRICO -->
-      <div class="card">
-        <div class="history-header">
-          <h2 class="page-title">Histórico de boleias dadas</h2>
-          <button class="secondary-btn small-btn" id="viewAllHistory">
-            Ver todas
-          </button>
-        </div>
-
-        <div id="rideHistory">
-          <div class="empty-state">
-            Ainda não tens histórico de boleias.
-          </div>
-        </div>
-      </div>
-
-      <!-- RESUMO CONTA -->
       <div class="card account-main-card">
         <h2 class="page-title">Resumo da conta</h2>
 
         <div class="stats">
           <div class="stat">
-            <strong id="totalRides">0</strong>
-            <span>Boleias criadas</span>
+            <strong id="userRating">—</strong>
+            <span>Rating médio</span>
           </div>
 
           <div class="stat">
-            <strong id="totalSeats">0</strong>
-            <span>Lugares disponíveis</span>
+            <strong id="ratingCount">0</strong>
+            <span>Total de avaliações</span>
           </div>
 
           <div class="stat">
@@ -64,7 +43,7 @@
         </div>
 
         <div class="account-user-block">
-          <h3 class="section-subtitle">Informações do Utilizador</h3>
+          <h3 class="section-subtitle">Informações do utilizador</h3>
 
           <div class="user-info-grid" id="userInfoGrid">
             <div class="info-item">
@@ -81,18 +60,13 @@
               <span class="info-label">Telemóvel</span>
               <strong id="userPhone">—</strong>
             </div>
-
-            <div class="info-item">
-              <span class="info-label">ID de utilizador</span>
-              <strong id="userId">—</strong>
-            </div>
           </div>
         </div>
       </div>
     </section>
   </main>
 
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="../js/account.js"></script>
+  <script src="../js/user-profile.js"></script>
 </body>
+
 </html>

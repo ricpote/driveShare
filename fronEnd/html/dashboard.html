@@ -13,14 +13,14 @@
   <main class="app-shell dashboard-shell">
     <header class="topbar">
       <div>
-        <h1>Dashboard</h1>
+        <h1>Marcar Viagem</h1>
         <p id="welcomeText">Bem-vindo ao UniRide</p>
       </div>
 
       <div class="topbar-actions">
-        <a href="rides.html"><button type="button" class="secondary-btn">Ver boleias</button></a>
-        <a href="account.html"><button type="button" class="secondary-btn">Conta</button></a>
-        <button type="button" id="logoutBtn" class="secondary-btn">Terminar sessão</button>
+        <a href="rides.html" class="secondary-btn nav-btn">Viagens</a>
+        <a href="account.html" class="secondary-btn nav-btn">Conta</a>
+        <button id="logoutBtn" class="primary-btn topbar-primary" type="button">Terminar sessão</button>
       </div>
     </header>
 
@@ -63,25 +63,48 @@
                   Encontrar no mapa
                 </button>
               </div>
-              <p class="helper-text helper-text-tight">
-                Escreve uma zona, rua ou local e carrega em “Encontrar no mapa”.
-              </p>
             </div>
 
             <div class="origin-row">
               <label for="destination">Destino</label>
-              <input type="text" id="destination" placeholder="Ex: FCT NOVA" required />
+              <div class="origin-input-row">
+                <input type="text" id="destination" placeholder="Ex: FCT NOVA" required />
+                <button type="button" id="findDestinationBtn" class="secondary-btn map-search-btn">
+                  Encontrar no mapa
+                </button>
+              </div>
             </div>
           </div>
 
-          <label>Ponto de partida no mapa</label>
+          <label>Mapa</label>
+
+          <div class="map-mode-selector">
+            <label class="radio-option">
+              <input type="radio" name="mapMode" value="origin" checked />
+              <span>Origem</span>
+            </label>
+
+            <label class="radio-option">
+              <input type="radio" name="mapMode" value="destination" />
+              <span>Destino</span>
+            </label>
+          </div>
+
+          <p id="mapModeInfo" class="helper-text helper-text-tight">
+            Seleção ativa: origem. Clica no mapa para definir a morada.
+          </p>
+
           <div id="createRideMap"></div>
+
           <p class="helper-text helper-text-tight">
-            Clica no mapa para marcar o ponto de partida da boleia ou pesquisa a origem pelo nome.
+            Podes escrever a morada e procurar no mapa, ou clicar diretamente no mapa. O ponto vai preencher o campo
+            selecionado.
           </p>
 
           <input type="hidden" id="startLat" />
           <input type="hidden" id="startLng" />
+          <input type="hidden" id="destinationLat" />
+          <input type="hidden" id="destinationLng" />
 
           <div class="form-grid two-columns">
             <div>

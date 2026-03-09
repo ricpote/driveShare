@@ -11,38 +11,58 @@
 </head>
 
 <body>
-  <main class="app-shell">
+  <main class="app-shell rides-shell">
     <header class="topbar">
       <div>
-        <h1>Boleias disponíveis</h1>
+        <h1>Viagens disponíveis</h1>
         <p>Encontra estudantes que vão para a mesma universidade.</p>
       </div>
 
       <div class="topbar-actions">
-        <a href="dashboard.html" class="secondary-btn nav-btn">Dashboard</a>
+        <a href="dashboard.html" class="secondary-btn nav-btn">Marcar Viagem</a>
         <a href="account.html" class="secondary-btn nav-btn">Conta</a>
-        <button type="button" id="logoutBtn" class="secondary-btn">Terminar sessão</button>
+        <button id="logoutBtn" class="primary-btn topbar-primary" type="button">Terminar sessão</button>
       </div>
     </header>
 
-    <div class="rides-layout">
-      <section class="mapcard">
-        <div class="section-top">
-          <h2 class="page-title">Mapa de boleias</h2>
-        </div>
-        <div id="map"></div>
-      </section>
+    <section class="mapcard rides-map-top">
+      <div class="section-top">
+        <h2 class="page-title">Mapa de Viagens</h2>
+      </div>
+      <div id="map"></div>
+    </section>
 
-      <section class="card list-card">
-        <div class="section-top">
-          <h2 class="page-title">Lista de boleias</h2>
-          <button type="button" id="refreshRidesBtn" class="primary-btn">Atualizar</button>
+    <section class="card list-card rides-list-bottom">
+      <div class="section-top">
+        <h2 class="page-title">Lista de Viagens</h2>
+        <button type="button" id="refreshRidesBtn" class="secondary-btn">Atualizar</button>
+      </div>
+
+      <div class="rides-filters">
+        <div class="filter-item">
+          <label for="filterDate">Dia</label>
+          <input type="date" id="filterDate" />
         </div>
 
-        <div id="ridesMessage" class="message hidden"></div>
-        <div id="ridesContainer"></div>
-      </section>
-    </div>
+        <div class="filter-item">
+          <label for="filterDepartureTime">Hora de partida</label>
+          <input type="time" id="filterDepartureTime" />
+        </div>
+
+        <div class="filter-item">
+          <label for="filterArrivalTime">Hora de chegada</label>
+          <input type="time" id="filterArrivalTime" />
+        </div>
+
+        <div class="filter-actions">
+          <button type="button" id="applyFiltersBtn" class="secondary-btn">Filtrar</button>
+          <button type="button" id="clearFiltersBtn" class="secondary-btn">Limpar</button>
+        </div>
+      </div>
+
+      <div id="ridesMessage" class="message hidden"></div>
+      <div id="ridesContainer" class="rides-scroll-list"></div>
+    </section>
   </main>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>

@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UniRide | Detalhes da boleia</title>
 
   <link rel="stylesheet" href="../css/styles.css" />
-
-  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 </head>
 
@@ -16,12 +15,12 @@
     <header class="topbar">
       <div>
         <h1>Detalhes da boleia</h1>
-        <p>Consulta o contacto do condutor antes de combinar a boleia.</p>
+        <p>Escolhe a tua paragem antes de enviar o pedido.</p>
       </div>
 
       <div class="topbar-actions">
-        <a href="rides.html"><button class="secondary-btn">Voltar às boleias</button></a>
-        <a href="account.html"><button class="primary-btn topbar-primary">Conta</button></a>
+        <a href="rides.html" class="secondary-btn nav-btn">Voltar às boleias</a>
+        <a href="account.html" class="primary-btn topbar-primary nav-btn">Conta</a>
       </div>
     </header>
 
@@ -32,11 +31,8 @@
     </section>
   </main>
 
-  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-  <!-- Script da página -->
   <script src="../js/ride-details.js"></script>
-
 </body>
+
 </html>

@@ -1,160 +1,332 @@
-const SESSION_KEY = "uniride_current_user";
-const RIDES_KEY = "rides";
+const API_RIDES_URL = "http://localhost:5000/api/rides";
+const rideDetailsCard = document.getElementById("rideDetailsCard");
 
-const currentUser = JSON.parse(localStorage.getItem(SESSION_KEY));
-if (!currentUser) window.location.href = "index.html";
+let map;
+let stopMarker = null;
+let selectedStop = null;
 
-const params = new URLSearchParams(window.location.search);
-const rideId = Number(params.get("id"));
-const rides = JSON.parse(localStorage.getItem(RIDES_KEY)) || [];
-const ride = rides.find((item) => item.id === rideId);
+function getToken() {
+  return localStorage.getItem("token");
+}
 
-const detailsCard = document.getElementById("rideDetailsCard");
+function requireAuth() {
+  const token = getToken();
 
-if (!ride) {
-  detailsCard.innerHTML = '<div class="empty-state">Não foi possível encontrar esta boleia.</div>';
-} else {
-  detailsCard.innerHTML = `
-    <div class="ride-details-header">
-      <div>
-        <p class="details-eyebrow">Boleia disponível</p>
-        <h2>${ride.origin} → ${ride.destination}</h2>
+  if (!token) {
+    window.location.href = "./index.html";
+    return null;
+  }
+
+  return token;
+}
+
+function getRideIdFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("rideId");
+}
+
+function formatDate(dateString) {
+  const date = new Date(dateString);
+
+  return date.toLocaleString("pt-PT", {
+    dateStyle: "short",
+    timeStyle: "short"
+  });
+}
+
+function updateSelectedStopInfo(lat, lng, label = "") {
+  const stopInfo = document.getElementById("selectedStopInfo");
+  if (!stopInfo) return;
+
+  if (label) {
+    stopInfo.textContent = `Paragem selecionada: ${label} (${lat.toFixed(5)}, ${lng.toFixed(5)})`;
+  } else {
+    stopInfo.textContent = `Paragem selecionada: ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+  }
+}
+
+function setStopMarker(lat, lng, label = "") {
+  selectedStop = { lat, lng, label };
+
+  if (stopMarker) {
+    stopMarker.setLatLng([lat, lng]);
+  } else {
+    stopMarker = L.marker([lat, lng]).addTo(map);
+  }
+
+  if (label) {
+    stopMarker.bindPopup(label).openPopup();
+  }
+
+  updateSelectedStopInfo(lat, lng, label);
+}
+
+async function reverseGeocode(lat, lng) {
+  const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lng)}`;
+
+  const response = await fetch(url, {
+    headers: {
+      Accept: "application/json"
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error("Erro ao converter coordenadas em morada.");
+  }
+
+  const result = await response.json();
+  return result.display_name || "";
+}
+
+function initMap() {
+  map = L.map("detailsMap").setView([38.661, -9.205], 11);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "&copy; OpenStreetMap contributors"
+  }).addTo(map);
+
+  map.on("click", async (event) => {
+    const { lat, lng } = event.latlng;
+    const stopInput = document.getElementById("stopAddress");
+
+    try {
+      const address = await reverseGeocode(lat, lng);
+      const label = address || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+
+      if (stopInput) {
+        stopInput.value = label;
+      }
+
+      setStopMarker(lat, lng, label);
+    } catch (error) {
+      console.error("Erro ao obter morada da paragem:", error);
+
+      const fallbackLabel = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+
+      if (stopInput) {
+        stopInput.value = fallbackLabel;
+      }
+
+      setStopMarker(lat, lng, fallbackLabel);
+    }
+  });
+}
+
+async function searchLocation(query) {
+  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`;
+
+  const response = await fetch(url, {
+    headers: {
+      Accept: "application/json"
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error("Erro ao procurar a localização.");
+  }
+
+  const results = await response.json();
+
+  if (!results.length) {
+    throw new Error("Não foi encontrada nenhuma localização para essa morada.");
+  }
+
+  return results[0];
+}
+
+async function handleFindStop() {
+  const stopInput = document.getElementById("stopAddress");
+  const query = stopInput?.value?.trim();
+
+  if (!query) {
+    alert("Escreve uma rua, zona ou local para procurar.");
+    return;
+  }
+
+  try {
+    const result = await searchLocation(query);
+
+    const lat = Number(result.lat);
+    const lng = Number(result.lon);
+    const label = result.display_name || query;
+
+    map.setView([lat, lng], 14);
+    if (stopInput) stopInput.value = label;
+    setStopMarker(lat, lng, label);
+  } catch (error) {
+    console.error("Erro ao procurar paragem:", error);
+    alert(error.message || "Não foi possível encontrar essa localização.");
+  }
+}
+
+async function fetchRideById(rideId) {
+  const token = requireAuth();
+  if (!token) return null;
+
+  const response = await fetch(API_RIDES_URL, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    }
+  });
+
+  if (response.status === 401) {
+    localStorage.removeItem("token");
+    window.location.href = "./index.html";
+    return null;
+  }
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Erro ao carregar boleias.");
+  }
+
+  return data.find((ride) => String(ride._id) === String(rideId)) || null;
+}
+
+function renderRideDetails(ride) {
+  rideDetailsCard.innerHTML = `
+    <h2 class="page-title">${ride.from} → ${ride.to}</h2>
+
+    <div class="ride-detail-block">
+      <p><strong>Partida:</strong> ${formatDate(ride.date)}</p>
+      <p><strong>Chegada:</strong> ${formatDate(ride.arrivalTime)}</p>
+      <p><strong>Lugares disponíveis:</strong> ${ride.availableSeats} / ${ride.totalSeats}</p>
+    </div>
+
+    <div class="ride-detail-block">
+      <h3>Escolher paragem</h3>
+      <div class="origin-row" style="margin-top: 12px;">
+        <label for="stopAddress">Morada / rua / zona</label>
+        <div class="origin-input-row">
+          <input
+            type="text"
+            id="stopAddress"
+            placeholder="Ex: Rua da Liberdade, Almada"
+          />
+          <button type="button" id="findStopBtn" class="secondary-btn map-search-btn">
+            Encontrar no mapa
+          </button>
+        </div>
+        <p class="helper-text helper-text-tight">
+          Escreve uma rua, zona ou local e carrega em “Encontrar no mapa”. Também podes clicar diretamente no mapa.
+        </p>
       </div>
-      <span class="details-badge">${ride.time}</span>
+
+      <div id="detailsMap" style="height: 400px; border-radius: 12px; margin-top: 12px;"></div>
+
+      <p id="selectedStopInfo" class="helper-text" style="margin-top: 12px;">
+        Ainda não escolheste nenhuma paragem.
+      </p>
     </div>
 
-    <div class="details-grid">
-      <div class="details-panel">
-        <h3>Condutor</h3>
-        <div class="contact-item">
-          <span class="info-label">Nome</span>
-          <strong>${ride.driverName}</strong>
-        </div>
-        <div class="contact-item">
-          <span class="info-label">Email</span>
-          <strong>${ride.driverEmail || "—"}</strong>
-        </div>
-        <div class="contact-item">
-          <span class="info-label">Telemóvel</span>
-          <strong>${ride.driverPhone || "—"}</strong>
-        </div>
-      </div>
-
-      <div class="details-panel">
-        <h3>Detalhes da boleia</h3>
-        <div class="contact-item">
-          <span class="info-label">Origem</span>
-          <strong>${ride.origin}</strong>
-        </div>
-        <div class="contact-item">
-          <span class="info-label">Destino</span>
-          <strong>${ride.destination}</strong>
-        </div>
-        <div class="contact-item">
-          <span class="info-label">Lugares disponíveis</span>
-          <strong>${ride.seats}</strong>
-        </div>
-      </div>
-    </div>
-
-    <div class="details-comment-box">
-      <span class="info-label">Comentário do condutor</span>
-      <p>${ride.comment || "Sem comentário adicional."}</p>
-    </div>
-
-    <div class="ride-search-box" style="margin-bottom:10px;">
-      <input type="text" id="pickupSearch" placeholder="Procura a rua ou zona para ser apanhado" />
-      <button id="searchPickupBtn" class="secondary-btn map-search-btn">Encontrar</button>
-    </div>
-
-    <div id="rideMap" style="height:300px;margin-top:10px;border-radius:12px;"></div>
-
-    <div style="margin-top:10px;">
-      <button id="requestRideBtn" class="primary-btn">Pedir boleia</button>
+    <div class="ride-detail-actions" style="margin-top: 20px; display: flex; gap: 12px;">
+      <button type="button" id="submitRideRequestBtn" class="primary-btn">Confirmar pedido</button>
+      <button type="button" id="cancelRideRequestBtn" class="secondary-btn">Cancelar</button>
     </div>
   `;
-}
 
-// ====== MAPA E PICKUP ======
-if (ride) {
-  const map = L.map("rideMap").setView([ride.startLat, ride.startLng], 12);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "© OpenStreetMap" }).addTo(map);
+  initMap();
 
-  const FCT = [38.661, -9.204];
-  L.marker([ride.startLat, ride.startLng]).addTo(map).bindPopup("Origem da boleia");
-  L.marker(FCT).addTo(map).bindPopup("FCT NOVA");
+  if (
+    ride.startLocation &&
+    typeof ride.startLocation.lat === "number" &&
+    typeof ride.startLocation.lng === "number"
+  ) {
+    L.marker([ride.startLocation.lat, ride.startLocation.lng])
+      .addTo(map)
+      .bindPopup("Ponto de partida da boleia");
 
-  // Traço inicial do percurso
-  let routePolyline = L.polyline([[ride.startLat, ride.startLng], FCT], { color: "#136f63", weight: 4 }).addTo(map);
-
-  let pickupMarker = null;
-
-  function updateRoute(lat, lng) {
-    if (routePolyline) map.removeLayer(routePolyline);
-    routePolyline = L.polyline([[lat, lng], FCT], { color: "#136f63", weight: 4 }).addTo(map);
+    map.setView([ride.startLocation.lat, ride.startLocation.lng], 12);
   }
 
-  map.on("click", (e) => {
-    const { lat, lng } = e.latlng;
-    if (pickupMarker) pickupMarker.setLatLng([lat, lng]);
-    else {
-      pickupMarker = L.marker([lat, lng]).addTo(map).bindPopup("Ponto de pickup").openPopup();
-    }
-    updateRoute(lat, lng);
+  const submitBtn = document.getElementById("submitRideRequestBtn");
+  const cancelBtn = document.getElementById("cancelRideRequestBtn");
+  const findStopBtn = document.getElementById("findStopBtn");
+  const stopAddressInput = document.getElementById("stopAddress");
+
+  submitBtn.addEventListener("click", () => submitRideRequest(ride._id));
+  cancelBtn.addEventListener("click", () => {
+    window.location.href = "./rides.html";
   });
 
-  // ===== BUSCA DE ORIGEM =====
-  const pickupSearch = document.getElementById("pickupSearch");
-  const searchBtn = document.getElementById("searchPickupBtn");
+  findStopBtn.addEventListener("click", handleFindStop);
 
-  async function geocode(query) {
-    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}&countrycodes=pt`);
-    const data = await res.json();
-    if (!data.length) throw new Error("Local não encontrado");
-    return data[0];
+  stopAddressInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleFindStop();
+    }
+  });
+}
+
+async function submitRideRequest(rideId) {
+  const token = requireAuth();
+  if (!token) return;
+
+  if (!selectedStop) {
+    alert("Tens de escolher uma paragem no mapa antes de enviar o pedido.");
+    return;
   }
 
-  async function searchPickup() {
-    const query = pickupSearch.value.trim();
-    if (!query) return alert("Escreve um local para procurar.");
-    try {
-      const result = await geocode(query);
-      const lat = Number(result.lat);
-      const lng = Number(result.lon);
-      if (pickupMarker) pickupMarker.setLatLng([lat, lng]);
-      else pickupMarker = L.marker([lat, lng]).addTo(map).bindPopup("Ponto de pickup").openPopup();
-      map.setView([lat, lng], 14);
-      updateRoute(lat, lng);
-    } catch (err) {
-      alert(err.message);
-    }
-  }
-
-  searchBtn.addEventListener("click", searchPickup);
-  pickupSearch.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); searchPickup(); } });
-
-  // ===== PEDIDO DE BOLEIA =====
-  const requestBtn = document.getElementById("requestRideBtn");
-
-  requestBtn.addEventListener("click", () => {
-    if (!pickupMarker) {
-      alert("Escolhe no mapa onde queres ser apanhado ou pesquisa a rua.");
-      return;
-    }
-    const { lat, lng } = pickupMarker.getLatLng();
-
-    if (!ride.requests) ride.requests = [];
-
-    ride.requests.push({
-      id: Date.now(),
-      userId: currentUser.id,
-      name: currentUser.name,
-      lat,
-      lng,
-      status: "pending"
+  try {
+    const response = await fetch(`${API_RIDES_URL}/${rideId}/request`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        lat: selectedStop.lat,
+        lng: selectedStop.lng
+      })
     });
 
-    localStorage.setItem(RIDES_KEY, JSON.stringify(rides));
-    alert("Pedido enviado ao condutor.");
-  });
+    const data = await response.json();
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        localStorage.removeItem("token");
+        window.location.href = "./index.html";
+        return;
+      }
+
+      alert(data.error || "Erro ao enviar pedido.");
+      return;
+    }
+
+    alert("Pedido enviado ao condutor com sucesso.");
+    window.location.href = "./rides.html";
+  } catch (error) {
+    console.error("Erro ao enviar pedido:", error);
+    alert("Não foi possível ligar ao servidor.");
+  }
 }
+
+async function loadRideDetails() {
+  const rideId = getRideIdFromUrl();
+
+  if (!rideId) {
+    rideDetailsCard.innerHTML = `<div class="empty-state">ID da boleia em falta.</div>`;
+    return;
+  }
+
+  try {
+    const ride = await fetchRideById(rideId);
+
+    if (!ride) {
+      rideDetailsCard.innerHTML = `<div class="empty-state">Boleia não encontrada.</div>`;
+      return;
+    }
+
+    renderRideDetails(ride);
+  } catch (error) {
+    console.error("Erro ao carregar detalhes da boleia:", error);
+    rideDetailsCard.innerHTML = `<div class="empty-state">Erro ao carregar detalhes da boleia.</div>`;
+  }
+}
+
+requireAuth();
+loadRideDetails();

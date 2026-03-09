@@ -5,8 +5,15 @@ const ridesMessage = document.getElementById("ridesMessage");
 const logoutBtn = document.getElementById("logoutBtn");
 const refreshRidesBtn = document.getElementById("refreshRidesBtn");
 
+const filterDateInput = document.getElementById("filterDate");
+const filterDepartureTimeInput = document.getElementById("filterDepartureTime");
+const filterArrivalTimeInput = document.getElementById("filterArrivalTime");
+const applyFiltersBtn = document.getElementById("applyFiltersBtn");
+const clearFiltersBtn = document.getElementById("clearFiltersBtn");
+
 let map;
 let markersLayer;
+let allRides = [];
 
 function showMessage(text, type = "error") {
   if (!ridesMessage) return;
@@ -72,6 +79,14 @@ function formatDate(dateString) {
   });
 }
 
+function formatTime(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleTimeString("pt-PT", {
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
 function initMap() {
   const mapElement = document.getElementById("map");
   if (!mapElement) return;
@@ -90,84 +105,71 @@ function renderMapMarkers(rides) {
 
   markersLayer.clearLayers();
 
+  const bounds = [];
+
   rides.forEach((ride) => {
     if (
       ride.startLocation &&
       typeof ride.startLocation.lat === "number" &&
       typeof ride.startLocation.lng === "number"
     ) {
-      L.marker([ride.startLocation.lat, ride.startLocation.lng])
+      const marker = L.marker([ride.startLocation.lat, ride.startLocation.lng])
         .addTo(markersLayer)
         .bindPopup(`
           <strong>${ride.from} → ${ride.to}</strong><br>
           Partida: ${formatDate(ride.date)}
         `);
+
+      bounds.push(marker.getLatLng());
     }
   });
-}
 
-function getCurrentPosition() {
-  return new Promise((resolve, reject) => {
-    if (!navigator.geolocation) {
-      reject(new Error("A geolocalização não é suportada neste browser."));
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        resolve({
-          lat: position.coords.latitude,
-          lng: position.coords.longitude
-        });
-      },
-      () => {
-        reject(new Error("Não foi possível obter a tua localização."));
-      }
-    );
-  });
-}
-
-async function requestToJoinRide(rideId) {
-  hideMessage();
-
-  const token = requireAuth();
-  if (!token) return;
-
-  try {
-    showMessage("A obter localização...", "success");
-
-    const location = await getCurrentPosition();
-
-    const response = await fetch(`${API_RIDES_URL}/${rideId}/request`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        lat: location.lat,
-        lng: location.lng
-      })
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      if (response.status === 401) {
-        localStorage.removeItem("token");
-        window.location.href = "./index.html";
-        return;
-      }
-
-      showMessage(data.error || "Erro ao pedir entrada.");
-      return;
-    }
-
-    showMessage("Pedido enviado ao condutor.", "success");
-  } catch (error) {
-    console.error("Erro ao pedir entrada:", error);
-    showMessage(error.message || "Não foi possível enviar o pedido.");
+  if (bounds.length > 0 && map) {
+    map.fitBounds(bounds, { padding: [30, 30] });
   }
+}
+
+function openRideDetails(rideId) {
+  window.location.href = `./ride-details.html?rideId=${rideId}`;
+}
+
+function isFutureRide(ride) {
+  return new Date(ride.date).getTime() >= Date.now();
+}
+
+function sortRidesByDepartureDate(rides) {
+  return [...rides].sort((a, b) => {
+    const dateA = new Date(a.date).getTime();
+    const dateB = new Date(b.date).getTime();
+    return dateA - dateB;
+  });
+}
+
+function sameDate(dateString, filterDate) {
+  const date = new Date(dateString);
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}` === filterDate;
+}
+
+function matchesTime(dateString, filterTime) {
+  if (!filterTime) return true;
+  return formatTime(dateString) === filterTime;
+}
+
+function applyFilters(rides) {
+  const filterDate = filterDateInput?.value || "";
+  const filterDepartureTime = filterDepartureTimeInput?.value || "";
+  const filterArrivalTime = filterArrivalTimeInput?.value || "";
+
+  return rides.filter((ride) => {
+    const matchesDateFilter = !filterDate || sameDate(ride.date, filterDate);
+    const matchesDepartureFilter = !filterDepartureTime || matchesTime(ride.date, filterDepartureTime);
+    const matchesArrivalFilter = !filterArrivalTime || matchesTime(ride.arrivalTime, filterArrivalTime);
+
+    return matchesDateFilter && matchesDepartureFilter && matchesArrivalFilter;
+  });
 }
 
 function renderRides(rides) {
@@ -176,7 +178,7 @@ function renderRides(rides) {
   ridesContainer.innerHTML = "";
 
   if (!rides.length) {
-    ridesContainer.innerHTML = `<p class="helper-text">Não existem boleias disponíveis de momento.</p>`;
+    ridesContainer.innerHTML = `<p class="helper-text">Não existem boleias para os filtros selecionados.</p>`;
     return;
   }
 
@@ -206,9 +208,18 @@ function renderRides(rides) {
   document.querySelectorAll(".join-ride-btn").forEach((button) => {
     button.addEventListener("click", () => {
       const rideId = button.dataset.rideId;
-      requestToJoinRide(rideId);
+      openRideDetails(rideId);
     });
   });
+}
+
+function updateView() {
+  const futureRides = allRides.filter(isFutureRide);
+  const filteredRides = applyFilters(futureRides);
+  const sortedRides = sortRidesByDepartureDate(filteredRides);
+
+  renderRides(sortedRides);
+  renderMapMarkers(sortedRides);
 }
 
 async function loadRides() {
@@ -244,8 +255,8 @@ async function loadRides() {
       return;
     }
 
-    renderRides(data);
-    renderMapMarkers(data);
+    allRides = Array.isArray(data) ? data : [];
+    updateView();
   } catch (error) {
     console.error("Erro ao carregar boleias:", error);
     if (ridesContainer) ridesContainer.innerHTML = "";
@@ -262,6 +273,19 @@ if (logoutBtn) {
 
 if (refreshRidesBtn) {
   refreshRidesBtn.addEventListener("click", loadRides);
+}
+
+if (applyFiltersBtn) {
+  applyFiltersBtn.addEventListener("click", updateView);
+}
+
+if (clearFiltersBtn) {
+  clearFiltersBtn.addEventListener("click", () => {
+    if (filterDateInput) filterDateInput.value = "";
+    if (filterDepartureTimeInput) filterDepartureTimeInput.value = "";
+    if (filterArrivalTimeInput) filterArrivalTimeInput.value = "";
+    updateView();
+  });
 }
 
 requireAuth();
