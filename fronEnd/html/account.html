@@ -4,110 +4,154 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>UniRide | Conta</title>
+  <title>UniRide | A minha conta</title>
   <link rel="stylesheet" href="../css/styles.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 </head>
 
-<body>
-  <main class="app-shell account-page">
-    <header class="topbar">
-      <div>
+<body class="account-page">
+  <div class="layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <span class="sidebar-logo">🚗</span>
+        <span class="sidebar-name">UniRide</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="16"/>
+            <line x1="8" y1="12" x2="16" y2="12"/>
+          </svg>
+          <span>Criar boleia</span>
+        </a>
+        <a href="rides.html" class="nav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
+            <line x1="8" y1="2" x2="8" y2="18"/>
+            <line x1="16" y1="6" x2="16" y2="22"/>
+          </svg>
+          <span>Viagens</span>
+        </a>
+        <a href="account.html" class="nav-item active">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          <span>Conta</span>
+        </a>
+      </nav>
+      <div class="sidebar-divider"></div>
+      <button id="logoutBtn" class="sidebar-logout">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        <span>Terminar sessão</span>
+      </button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+      <div class="page-header">
         <h1>A minha conta</h1>
         <p>Consulta os teus dados e atividade no UniRide.</p>
       </div>
 
-      <div class="topbar-actions">
-        <a href="dashboard.html" class="secondary-btn nav-btn">Marcar Viagem</a>
-        <a href="rides.html" class="secondary-btn nav-btn">Viagens</a>
-        <button id="logoutBtn" class="primary-btn topbar-primary" type="button">Terminar sessão</button>
-      </div>
-    </header>
+      <section class="account-layout">
 
-    <section class="account-layout">
-      <div class="card rides-active-card">
-        <h2 class="page-title">Boleias marcadas</h2>
-        <div id="rideActiveContainer"></div>
-      </div>
-
-      <div class="card">
-        <div class="history-header">
-          <h2 class="page-title">Histórico de boleias</h2>
-        </div>
-
-        <div id="rideHistory">
-          <div class="empty-state">
-            Ainda não tens histórico de boleias.
+        <!-- Active Rides Card -->
+        <div class="card">
+          <div class="history-header">
+            <h2 class="card-title" style="margin-bottom:0">Boleias marcadas</h2>
           </div>
-        </div>
-      </div>
-
-      <div class="card account-main-card">
-        <h2 class="page-title">Resumo da conta</h2>
-
-        <div class="stats">
-          <div class="stat">
-            <strong id="totalRides">0</strong>
-            <span>Boleias criadas</span>
-          </div>
-
-          <div class="stat">
-            <strong id="userRating">—</strong>
-            <span>Rating médio</span>
-          </div>
-
-          <div class="stat">
-            <strong id="co2Saved">0 kg</strong>
-            <span>CO₂ estimado poupado</span>
+          <div style="height:16px"></div>
+          <div id="rideActiveContainer">
+            <div class="empty-state">A carregar boleias ativas...</div>
           </div>
         </div>
 
-        <div class="account-user-block">
-          <h3 class="section-subtitle">
-            Dados pessoais
-            <button id="editUserBtn" class="secondary-btn small-btn" type="button">Editar</button>
-          </h3>
+        <!-- Ride History Card -->
+        <div class="card">
+          <div class="history-header">
+            <h2 class="card-title" style="margin-bottom:0">Histórico de viagens</h2>
+          </div>
+          <div style="height:16px"></div>
+          <div id="rideHistory">
+            <div class="empty-state">Sem histórico de viagens.</div>
+          </div>
+        </div>
 
-          <div class="user-info-grid" id="userInfoGrid">
-            <div class="info-item">
-              <span class="info-label">Nome</span>
-              <strong id="userName">—</strong>
+        <!-- Account Summary Card -->
+        <div class="card">
+          <h2 class="card-title">Resumo da conta</h2>
+
+          <!-- Stats -->
+          <div class="stats">
+            <div class="stat">
+              <strong id="totalRides">—</strong>
+              <span>Viagens totais</span>
             </div>
-
-            <div class="info-item">
-              <span class="info-label">Email</span>
-              <strong id="userEmail">—</strong>
+            <div class="stat">
+              <strong id="userRating">—</strong>
+              <span>Avaliação</span>
             </div>
-
-            <div class="info-item">
-              <span class="info-label">Telemóvel</span>
-              <strong id="userPhone">—</strong>
+            <div class="stat">
+              <strong id="co2Saved">—</strong>
+              <span>CO₂ poupado (kg)</span>
             </div>
           </div>
 
-          <form id="editUserForm" class="account-edit-form" style="display: none; margin-top: 1rem;">
-            <div class="user-info-grid">
+          <!-- User Info Block -->
+          <div class="account-user-block">
+            <div class="section-subtitle">
+              <span>Dados pessoais</span>
+              <button id="editUserBtn" class="secondary-btn small-btn">Editar</button>
+            </div>
+
+            <div id="userInfoGrid" class="user-info-grid">
               <div class="info-item">
-                <label class="info-label" for="editName">Nome</label>
-                <input id="editName" name="name" type="text" class="auth-input" placeholder="O teu nome" required />
+                <span class="info-label">Nome</span>
+                <strong id="userName">—</strong>
               </div>
-
               <div class="info-item">
-                <label class="info-label" for="editPhone">Telemóvel</label>
-                <input id="editPhone" name="phone" type="text" class="auth-input" placeholder="O teu telemóvel"
-                  required />
+                <span class="info-label">Email</span>
+                <strong id="userEmail">—</strong>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Telemóvel</span>
+                <strong id="userPhone">—</strong>
               </div>
             </div>
 
-            <div class="topbar-actions" style="margin-top: 1rem; justify-content: flex-start;">
-              <button id="saveUserBtn" type="submit" class="primary-btn small-btn">Guardar</button>
-              <button id="cancelEditUserBtn" type="button" class="secondary-btn small-btn">Cancelar</button>
-            </div>
-          </form>
+            <!-- Edit Form (hidden by default) -->
+            <form id="editUserForm" class="account-edit-form" style="display:none">
+              <div class="form-grid two-columns">
+                <div>
+                  <label for="editName">Nome</label>
+                  <input type="text" id="editName" placeholder="O teu nome" />
+                </div>
+                <div>
+                  <label for="editPhone">Telemóvel</label>
+                  <input type="tel" id="editPhone" placeholder="+351 9XX XXX XXX" />
+                </div>
+              </div>
+              <div class="form-actions">
+                <button id="saveUserBtn" type="submit" class="primary-btn small-btn" style="width:auto">Guardar</button>
+                <button id="cancelEditUserBtn" type="button" class="secondary-btn small-btn">Cancelar</button>
+              </div>
+            </form>
+
+          </div>
         </div>
-      </div>
-    </section>
-  </main>
+
+      </section>
+    </main>
+
+  </div>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="../js/account.js"></script>

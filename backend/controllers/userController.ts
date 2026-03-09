@@ -78,8 +78,10 @@ export const googleAuthCallback = (db: Db) => async (req: Request, res: Response
   try {
     const googleUser = req.user as any;
 
+    const FRONTEND_URL = "http://localhost:5500/fronEnd/html";
+
     if (!googleUser || !googleUser.emails) {
-      return res.redirect("/index.html?error=auth_failed");
+      return res.redirect(`${FRONTEND_URL}/index.html?error=auth_failed`);
     }
 
     const email = googleUser.emails[0].value.toLowerCase();
@@ -88,7 +90,7 @@ export const googleAuthCallback = (db: Db) => async (req: Request, res: Response
     const dominioPermitido = "@campus.fct.unl.pt";
 
     if (!email.endsWith(dominioPermitido)) {
-      return res.redirect("/index.html?error=dominio_invalido");
+      return res.redirect(`${FRONTEND_URL}/index.html?error=dominio_invalido`);
     }
 
     const usersCollection = db.collection<IUser>("users");
@@ -108,7 +110,7 @@ export const googleAuthCallback = (db: Db) => async (req: Request, res: Response
     }
 
     if (!user) {
-      return res.redirect("/index.html?error=user_creation_failed");
+      return res.redirect(`${FRONTEND_URL}/index.html?error=user_creation_failed`);
     }
 
     const token = jwt.sign(
@@ -117,10 +119,11 @@ export const googleAuthCallback = (db: Db) => async (req: Request, res: Response
       { expiresIn: "1h" }
     );
 
-    res.redirect(`http://localhost:5500/pages/dashboard.html?token=${token}`);
+    res.redirect(`${FRONTEND_URL}/dashboard.html?token=${token}`);
   } catch (err) {
     console.error("Erro no Google Callback:", err);
-    res.redirect("/index.html?error=server_error");
+    const FRONTEND_URL = "http://localhost:5500/fronEnd/html";
+    res.redirect(`${FRONTEND_URL}/index.html?error=server_error`);
   }
 };
 

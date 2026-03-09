@@ -19,6 +19,28 @@ export default function userRoutes(db: Db) {
   router.post("/register", registerUser(db));
   router.post("/login", loginUser(db));
 
+  // --- OAUTH --- (must be before /:userId wildcard)
+
+  // 1. Inicia o fluxo do Google
+  router.get(
+    "/auth/google",
+    passport.authenticate("google", {
+      scope: ["profile", "email"],
+      hd: "campus.fct.unl.pt",
+      prompt: "select_account"
+    })
+  );
+
+  // 2. Callback onde o Google devolve os dados
+  router.get(
+    "/auth/google/callback",
+    passport.authenticate("google", {
+      session: false,
+      failureRedirect: "http://localhost:5500/fronEnd/html/index.html?error=failed"
+    }),
+    googleAuthCallback(db)
+  );
+
   // Rating
   router.post("/rate", authMiddleware, rateUser(db));
 
@@ -28,27 +50,6 @@ export default function userRoutes(db: Db) {
 
   // Ver perfil de outro utilizador
   router.get("/:userId", authMiddleware, getUserById(db));
-
-  // --- OAUTH ---
-
-  // 1. Inicia o fluxo do Google
-  router.get(
-    "/auth/google",
-    passport.authenticate("google", {
-      scope: ["profile", "email"],
-      hd: "campus.fct.unl.pt"
-    })
-  );
-
-  // 2. Callback onde o Google devolve os dados
-  router.get(
-    "/auth/google/callback",
-    passport.authenticate("google", {
-      session: false,
-      failureRedirect: "/login?error=failed"
-    }),
-    googleAuthCallback(db)
-  );
 
   return router;
 }
