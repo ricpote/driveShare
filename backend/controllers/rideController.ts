@@ -4,9 +4,9 @@ import { IRide } from "../models/ride";
 
 export const createRide = (db: Db) => async (req: Request, res: Response) => {
   try {
-    const { from, to, date, arrivalTime, totalSeats } = req.body;
+    const { from, to, date, arrivalTime, totalSeats, startLocation, destinationLocation, comment } = req.body;
 
-    if (!from || !to || !date || !arrivalTime ||!totalSeats) {
+    if (!from || !to || !date || !arrivalTime || !totalSeats || !startLocation || !destinationLocation) {
       return res.status(400).json({ error: "Todos os campos são obrigatórios" });
     }
 
@@ -28,6 +28,19 @@ export const createRide = (db: Db) => async (req: Request, res: Response) => {
       arrivalTime: arrivalDate,
       totalSeats,
       availableSeats: totalSeats,
+      startLocation: startLocation
+        ? {
+          lat: Number(startLocation.lat),
+          lng: Number(startLocation.lng)
+        }
+        : undefined,
+      destinationLocation: destinationLocation
+        ? {
+          lat: Number(destinationLocation.lat),
+          lng: Number(destinationLocation.lng)
+        }
+        : undefined,
+
       createdAt: new Date()
     };
 
@@ -250,7 +263,7 @@ export const cancelRideParticipation = (db: Db) => async (req: Request, res: Res
     await db.collection("rides").updateOne(
       { _id: rideObjectId },
       {
-        $pull: { passengers: passengerObjectId } as any, 
+        $pull: { passengers: passengerObjectId } as any,
         $inc: { availableSeats: 1 }
       }
     );

@@ -10,10 +10,14 @@ export interface IRide {
   arrivalTime: Date;
   totalSeats: number;
   availableSeats: number;
-  comment?: string;
   startLocation?: {
     lat: number;
     lng: number;
   };
+  destinationLocation?: {
+    lat: number;
+    lng: number;
+  };
+  comment?: string;
   createdAt?: Date;
 }

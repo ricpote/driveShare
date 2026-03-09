@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
-import { Db } from "mongodb";
-import { ObjectId } from "mongodb";
+import { Db, ObjectId } from "mongodb";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { IUser } from "../models/user";
@@ -12,8 +11,9 @@ export const registerUser = (db: Db) => async (req: Request, res: Response) => {
 
     const existingUser = await db.collection("users").findOne({ email });
 
-    if (existingUser)
+    if (existingUser) {
       return res.status(400).json({ error: "Email já registado" });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -29,7 +29,10 @@ export const registerUser = (db: Db) => async (req: Request, res: Response) => {
 
     const result = await db.collection("users").insertOne(newUser);
 
-    res.status(201).json({ message: "Utilizador criado", userId: result.insertedId });
+    res.status(201).json({
+      message: "Utilizador criado",
+      userId: result.insertedId
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erro ao criar utilizador" });
@@ -46,9 +49,10 @@ export const loginUser = (db: Db) => async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Email ou password inválidos" });
     }
 
-    // Se o utilizador existir mas não tiver password (criado via Google)
     if (!user.password) {
-      return res.status(400).json({ error: "Conta registada via Google. Use o Login institucional." });
+      return res.status(400).json({
+        error: "Conta registada via Google. Use o Login institucional."
+      });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -69,10 +73,9 @@ export const loginUser = (db: Db) => async (req: Request, res: Response) => {
   }
 };
 
-// --- NOVO: GOOGLE OAUTH CALLBACK COM RESTRIÇÃO DE DOMÍNIO ---
+// --- GOOGLE OAUTH CALLBACK ---
 export const googleAuthCallback = (db: Db) => async (req: Request, res: Response) => {
   try {
-    // O passport coloca os dados do Google em req.user
     const googleUser = req.user as any;
 
     if (!googleUser || !googleUser.emails) {
@@ -82,28 +85,24 @@ export const googleAuthCallback = (db: Db) => async (req: Request, res: Response
     const email = googleUser.emails[0].value.toLowerCase();
     const name = googleUser.displayName;
 
-    // VALIDAÇÃO OBRIGATÓRIA DO DOMÍNIO DA FACULDADE
-    const dominioPermitido = "@campus.fct.unl.pt"; // <--- ALTERA PARA O TEU DOMÍNIO
+    const dominioPermitido = "@campus.fct.unl.pt";
 
     if (!email.endsWith(dominioPermitido)) {
-      // Se não for da faculdade, bloqueamos o acesso imediatamente
       return res.redirect("/index.html?error=dominio_invalido");
     }
 
     const usersCollection = db.collection<IUser>("users");
     let user = await usersCollection.findOne({ email });
 
-    // Se o aluno é novo, registamos na base de dados automaticamente
     if (!user) {
-      const newUser: any = {
+      const newUser: IUser = {
         name,
         email,
-        authType: "google", // Marcamos como utilizador OAuth
         ratingAverage: null,
         ratingCount: 0,
-        createdAt: new Date(),
-        // Para utilizadores Google, deixamos a password vazia ou indefinida
+        createdAt: new Date()
       };
+
       const result = await usersCollection.insertOne(newUser);
       user = { ...newUser, _id: result.insertedId };
     }
@@ -112,23 +111,20 @@ export const googleAuthCallback = (db: Db) => async (req: Request, res: Response
       return res.redirect("/index.html?error=user_creation_failed");
     }
 
-    // GERAÇÃO DO JWT (Mesmo formato que usas no loginUser)
     const token = jwt.sign(
       { userId: user._id, email: user.email },
       process.env.JWT_SECRET as string,
       { expiresIn: "1h" }
     );
 
-    // Como o OAuth é um redirecionamento de browser, enviamos o token na URL 
-    // para o teu frontend conseguir guardar no localStorage
     res.redirect(`http://localhost:5500/pages/dashboard.html?token=${token}`);
-
   } catch (err) {
     console.error("Erro no Google Callback:", err);
     res.redirect("/index.html?error=server_error");
   }
 };
 
+// --- RATE USER ---
 export const rateUser = (db: Db) => async (req: Request, res: Response) => {
   try {
     const { userId, rating } = req.body;
@@ -140,7 +136,9 @@ export const rateUser = (db: Db) => async (req: Request, res: Response) => {
     const users = db.collection<IUser>("users");
     const user = await users.findOne({ _id: new ObjectId(userId) });
 
-    if (!user) return res.status(404).json({ error: "Utilizador não encontrado" });
+    if (!user) {
+      return res.status(404).json({ error: "Utilizador não encontrado" });
+    }
 
     const currentAverage = user.ratingAverage || 0;
     const currentCount = user.ratingCount || 0;
@@ -158,13 +156,17 @@ export const rateUser = (db: Db) => async (req: Request, res: Response) => {
       }
     );
 
-    res.json({ message: "Rating atualizado", ratingAverage: newAverage });
-
+    res.json({
+      message: "Rating atualizado",
+      ratingAverage: newAverage
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erro ao avaliar utilizador" });
   }
 };
+
+// --- GET ME ---
 export const getMe = (db: Db) => async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId;
@@ -195,6 +197,8 @@ export const getMe = (db: Db) => async (req: Request, res: Response) => {
     res.status(500).json({ error: "Erro ao obter dados do utilizador" });
   }
 };
+
+// --- UPDATE ME ---
 export const updateMe = (db: Db) => async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId;
@@ -208,8 +212,8 @@ export const updateMe = (db: Db) => async (req: Request, res: Response) => {
       { _id: new ObjectId(userId) },
       {
         $set: {
-          name,
-          phone
+          name: String(name).trim(),
+          phone: String(phone).trim()
         }
       }
     );
@@ -219,13 +223,17 @@ export const updateMe = (db: Db) => async (req: Request, res: Response) => {
       { projection: { password: 0 } }
     );
 
+    if (!updatedUser) {
+      return res.status(404).json({ error: "Utilizador não encontrado" });
+    }
+
     res.status(200).json({
       message: "Dados atualizados com sucesso",
       user: {
-        userId: updatedUser?._id,
-        name: updatedUser?.name || null,
-        email: updatedUser?.email || null,
-        phone: updatedUser?.phone || null
+        userId: updatedUser._id,
+        name: updatedUser.name || null,
+        email: updatedUser.email || null,
+        phone: updatedUser.phone || null
       }
     });
   } catch (err) {
@@ -234,3 +242,37 @@ export const updateMe = (db: Db) => async (req: Request, res: Response) => {
   }
 };
 
+// --- GET USER BY ID ---
+export const getUserById = (db: Db) => async (
+  req: Request<{ userId: string }>,
+  res: Response
+) => {
+  try {
+    const { userId } = req.params;
+
+    if (!ObjectId.isValid(userId)) {
+      return res.status(400).json({ error: "ID de utilizador inválido" });
+    }
+
+    const user = await db.collection<IUser>("users").findOne(
+      { _id: new ObjectId(userId) },
+      { projection: { password: 0 } }
+    );
+
+    if (!user) {
+      return res.status(404).json({ error: "Utilizador não encontrado" });
+    }
+
+    res.status(200).json({
+      userId: user._id,
+      name: user.name || null,
+      email: user.email || null,
+      phone: user.phone || null,
+      ratingAverage: user.ratingAverage ?? null,
+      ratingCount: user.ratingCount ?? 0
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erro ao obter perfil do utilizador" });
+  }
+};
