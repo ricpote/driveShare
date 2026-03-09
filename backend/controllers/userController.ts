@@ -127,10 +127,21 @@ export const googleAuthCallback = (db: Db) => async (req: Request, res: Response
 // --- RATE USER ---
 export const rateUser = (db: Db) => async (req: Request, res: Response) => {
   try {
+    const loggedUserId = (req as any).user.userId;
     const { userId, rating } = req.body;
 
-    if (rating < 1 || rating > 5) {
-      return res.status(400).json({ error: "Rating deve ser entre 1 e 5" });
+    if (!userId || !ObjectId.isValid(userId)) {
+      return res.status(400).json({ error: "ID de utilizador inválido" });
+    }
+
+    const numericRating = Number(rating);
+
+    if (!Number.isInteger(numericRating) || numericRating < 1 || numericRating > 5) {
+      return res.status(400).json({ error: "Rating deve ser um número entre 1 e 5" });
+    }
+
+    if (String(loggedUserId) === String(userId)) {
+      return res.status(400).json({ error: "Não podes avaliar o teu próprio perfil" });
     }
 
     const users = db.collection<IUser>("users");
@@ -144,21 +155,23 @@ export const rateUser = (db: Db) => async (req: Request, res: Response) => {
     const currentCount = user.ratingCount || 0;
 
     const newCount = currentCount + 1;
-    const newAverage = (currentAverage * currentCount + rating) / newCount;
+    const newAverage = (currentAverage * currentCount + numericRating) / newCount;
+    const roundedAverage = Number(newAverage.toFixed(1));
 
     await users.updateOne(
       { _id: user._id },
       {
         $set: {
-          ratingAverage: newAverage,
+          ratingAverage: roundedAverage,
           ratingCount: newCount
         }
       }
     );
 
-    res.json({
+    res.status(200).json({
       message: "Rating atualizado",
-      ratingAverage: newAverage
+      ratingAverage: roundedAverage,
+      ratingCount: newCount
     });
   } catch (err) {
     console.error(err);
@@ -185,7 +198,6 @@ export const getMe = (db: Db) => async (req: Request, res: Response) => {
     }
 
     res.status(200).json({
-      userId: user._id,
       name: user.name || null,
       email: user.email || null,
       phone: user.phone || null,
@@ -230,10 +242,11 @@ export const updateMe = (db: Db) => async (req: Request, res: Response) => {
     res.status(200).json({
       message: "Dados atualizados com sucesso",
       user: {
-        userId: updatedUser._id,
         name: updatedUser.name || null,
         email: updatedUser.email || null,
-        phone: updatedUser.phone || null
+        phone: updatedUser.phone || null,
+        ratingAverage: updatedUser.ratingAverage ?? null,
+        ratingCount: updatedUser.ratingCount ?? 0
       }
     });
   } catch (err) {
@@ -264,7 +277,6 @@ export const getUserById = (db: Db) => async (
     }
 
     res.status(200).json({
-      userId: user._id,
       name: user.name || null,
       email: user.email || null,
       phone: user.phone || null,

@@ -20,7 +20,7 @@ export default function userRoutes(db: Db) {
   router.post("/login", loginUser(db));
 
   // Rating
-  router.post("/rate", rateUser(db));
+  router.post("/rate", authMiddleware, rateUser(db));
 
   // Utilizador autenticado
   router.get("/me", authMiddleware, getMe(db));
