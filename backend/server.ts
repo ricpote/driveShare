@@ -6,11 +6,20 @@ import passport from 'passport'; // Importante
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20'; // Importante
 import userRoutes from "./routes/userRoute";
 import rideRoutes from "./routes/rideRoute";
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
 const app = express();
 const PORT = 5000;
+
+app.use(express.static(path.join(__dirname, "../fronEnd/html")));
+app.use('/css', express.static(path.join(__dirname, "../fronEnd/css")));
+app.use('/js', express.static(path.join(__dirname, "../fronEnd/js")));
 
 app.use(cors());
 app.use(express.json());

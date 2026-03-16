@@ -119,7 +119,7 @@ export const googleAuthCallback = (db: Db) => async (req: Request, res: Response
       { expiresIn: "1h" }
     );
 
-    res.redirect(`${FRONTEND_URL}/dashboard.html?token=${token}`);
+    res.redirect(`/dashboard.html?token=${token}`);
   } catch (err) {
     console.error("Erro no Google Callback:", err);
     const FRONTEND_URL = "http://localhost:5500/fronEnd/html";
