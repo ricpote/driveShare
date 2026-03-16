@@ -36,7 +36,7 @@ export default function userRoutes(db: Db) {
     "/auth/google/callback",
     passport.authenticate("google", {
       session: false,
-      failureRedirect: "/login?error=failed"
+      failureRedirect: "http://localhost:5500/fronEnd/html/index.html?error=failed"
     }),
     googleAuthCallback(db)
   );

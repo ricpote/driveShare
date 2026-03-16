@@ -4,126 +4,176 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>UniRide | Dashboard</title>
+  <title>UniRide | Criar Boleia</title>
   <link rel="stylesheet" href="../css/styles.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 </head>
 
 <body>
-  <main class="app-shell dashboard-shell">
-    <header class="topbar">
-      <div>
-        <h1>Marcar Viagem</h1>
+  <div class="layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <span class="sidebar-logo">🚗</span>
+        <span class="sidebar-name">UniRide</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item active">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="16"/>
+            <line x1="8" y1="12" x2="16" y2="12"/>
+          </svg>
+          <span>Criar boleia</span>
+        </a>
+        <a href="rides.html" class="nav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
+            <line x1="8" y1="2" x2="8" y2="18"/>
+            <line x1="16" y1="6" x2="16" y2="22"/>
+          </svg>
+          <span>Viagens</span>
+        </a>
+        <a href="account.html" class="nav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          <span>Conta</span>
+        </a>
+      </nav>
+      <div class="sidebar-divider"></div>
+      <button id="logoutBtn" class="sidebar-logout">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        <span>Terminar sessão</span>
+      </button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+      <div class="page-header">
+        <h1>Criar Boleia</h1>
         <p id="welcomeText">Bem-vindo ao UniRide</p>
       </div>
 
-      <div class="topbar-actions">
-        <a href="rides.html" class="secondary-btn nav-btn">Viagens</a>
-        <a href="account.html" class="secondary-btn nav-btn">Conta</a>
-        <button id="logoutBtn" class="primary-btn topbar-primary" type="button">Terminar sessão</button>
-      </div>
-    </header>
+      <div class="dashboard-single">
+        <div class="card ride-form-card">
+          <h2 class="page-title">Nova boleia</h2>
+          <div id="rideMessage" class="message hidden"></div>
 
-    <section class="dashboard-single">
-      <div class="card ride-form-card wide-card">
-        <h2 class="page-title">Criar boleia</h2>
-        <div id="rideMessage" class="message hidden"></div>
+          <form id="rideForm" class="styled-form">
 
-        <form id="rideForm" class="styled-form">
-          <div class="form-grid vertical-layout">
+            <!-- Departure date and time -->
             <div class="datetime-row">
               <div class="datetime-item">
-                <label for="date">Data da partida</label>
+                <label for="date">Data de partida</label>
                 <input type="date" id="date" required />
               </div>
-
               <div class="datetime-item">
-                <label for="time">Hora da partida</label>
+                <label for="time">Hora de partida</label>
                 <input type="time" id="time" required />
               </div>
             </div>
 
+            <!-- Arrival date and time -->
             <div class="datetime-row">
               <div class="datetime-item">
                 <label for="arrivalDate">Data de chegada</label>
-                <input type="date" id="arrivalDate" required />
+                <input type="date" id="arrivalDate" />
               </div>
-
               <div class="datetime-item">
                 <label for="arrivalTime">Hora de chegada</label>
-                <input type="time" id="arrivalTime" required />
+                <input type="time" id="arrivalTime" />
               </div>
             </div>
 
+            <!-- Origin -->
             <div class="origin-row">
               <label for="origin">Origem</label>
               <div class="origin-input-row">
-                <input type="text" id="origin" placeholder="Ex: Corroios ou Rua da Liberdade, Almada" required />
-                <button type="button" id="findOriginBtn" class="secondary-btn map-search-btn">
-                  Encontrar no mapa
+                <input type="text" id="origin" placeholder="Ponto de partida" required />
+                <button type="button" id="findOriginBtn" class="inline-btn map-search-btn small-btn">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                  </svg>
+                  Localizar
+                </button>
+                <button type="button" id="useMyLocationBtn" class="secondary-btn map-search-btn small-btn" title="Usar a minha localização atual">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="9" stroke-dasharray="2 4"/>
+                  </svg>
+                  GPS
                 </button>
               </div>
             </div>
 
+            <!-- Destination -->
             <div class="origin-row">
               <label for="destination">Destino</label>
               <div class="origin-input-row">
-                <input type="text" id="destination" placeholder="Ex: FCT NOVA" required />
-                <button type="button" id="findDestinationBtn" class="secondary-btn map-search-btn">
-                  Encontrar no mapa
+                <input type="text" id="destination" placeholder="Ponto de chegada" required />
+                <button type="button" id="findDestinationBtn" class="inline-btn map-search-btn small-btn">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                  </svg>
+                  Localizar
                 </button>
               </div>
             </div>
-          </div>
 
-          <label>Mapa</label>
+            <!-- Map mode selector -->
+            <label>Modo do mapa</label>
+            <div class="map-mode-selector">
+              <label class="radio-option">
+                <input type="radio" name="mapMode" value="route" id="mapModeRoute" checked />
+                Rota
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="mapMode" value="pickup" id="mapModePickup" />
+                Paragens
+              </label>
+            </div>
+            <p id="mapModeInfo" class="helper-text helper-text-tight">Clica no mapa para definir o percurso.</p>
 
-          <div class="map-mode-selector">
-            <label class="radio-option">
-              <input type="radio" name="mapMode" value="origin" checked />
-              <span>Origem</span>
-            </label>
+            <!-- Map -->
+            <div id="createRideMap"></div>
 
-            <label class="radio-option">
-              <input type="radio" name="mapMode" value="destination" />
-              <span>Destino</span>
-            </label>
-          </div>
+            <!-- Hidden coordinate inputs -->
+            <input type="hidden" id="startLat" />
+            <input type="hidden" id="startLng" />
+            <input type="hidden" id="destinationLat" />
+            <input type="hidden" id="destinationLng" />
 
-          <p id="mapModeInfo" class="helper-text helper-text-tight">
-            Seleção ativa: origem. Clica no mapa para definir a morada.
-          </p>
-
-          <div id="createRideMap"></div>
-
-          <p class="helper-text helper-text-tight">
-            Podes escrever a morada e procurar no mapa, ou clicar diretamente no mapa. O ponto vai preencher o campo
-            selecionado.
-          </p>
-
-          <input type="hidden" id="startLat" />
-          <input type="hidden" id="startLng" />
-          <input type="hidden" id="destinationLat" />
-          <input type="hidden" id="destinationLng" />
-
-          <div class="form-grid two-columns">
-            <div>
-              <label for="seats">Lugares disponíveis</label>
-              <input type="number" id="seats" min="1" max="8" placeholder="Ex: 3" required />
+            <!-- Seats and comment -->
+            <div class="form-grid two-columns">
+              <div>
+                <label for="seats">Lugares disponíveis</label>
+                <input type="number" id="seats" min="1" max="8" value="3" required />
+              </div>
+              <div>
+                <label for="rideComment">Comentário <span style="color:var(--muted);font-weight:400">(opcional)</span></label>
+                <textarea id="rideComment" rows="3" placeholder="Ex: Paro no centro, aceito malas pequenas..."></textarea>
+              </div>
             </div>
 
-            <div>
-              <label for="rideComment">Comentário</label>
-              <textarea id="rideComment" rows="4"
-                placeholder="Ex: Passo pela estação de Corroios, posso esperar 5 minutos."></textarea>
-            </div>
-          </div>
-
-          <button type="submit" class="primary-btn">Guardar boleia</button>
-        </form>
+            <button type="submit" class="primary-btn">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"/>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+              Publicar boleia
+            </button>
+          </form>
+        </div>
       </div>
-    </section>
-  </main>
+    </main>
+
+  </div>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="../js/dashboard.js"></script>
