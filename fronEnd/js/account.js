@@ -194,6 +194,53 @@ function createManagedRideCard(ride) {
 
 function createHistoryManagedRideCard(ride) {
   const roleClass = ride.role === "driver" ? "role-driver" : "role-passenger";
+  const currentUserId = getCurrentUserId();
+  const isDriver = ride.role === "driver";
+
+  const confirmedPassengers = ride.confirmedByPassengers || [];
+  const currentUserConfirmed = isDriver
+    ? ride.confirmedByDriver === true
+    : confirmedPassengers.some((id) => id.toString() === currentUserId);
+  const isFullyVerified = ride.status === "completed";
+
+  let statusHtml;
+  if (isFullyVerified) {
+    statusHtml = `
+      <div class="ride-request-item">
+        <div class="ride-request-content">
+          <strong>Viagem verificada</strong>
+          <p class="request-status accepted">Todos confirmaram. A viagem aconteceu!</p>
+        </div>
+      </div>
+    `;
+  } else if (currentUserConfirmed) {
+    statusHtml = `
+      <div class="ride-request-item">
+        <div class="ride-request-content">
+          <strong>Já confirmaste</strong>
+          <p class="request-status pending">A aguardar confirmação dos restantes participantes.</p>
+        </div>
+      </div>
+    `;
+  } else {
+    statusHtml = `
+      <div class="ride-request-item">
+        <div class="ride-request-content">
+          <strong>A viagem aconteceu?</strong>
+          <p>Confirma a tua participação para registar a boleia.</p>
+        </div>
+        <div class="ride-request-actions">
+          <button
+            type="button"
+            class="primary-btn small-btn confirm-ride-btn"
+            data-ride-id="${ride._id}"
+          >
+            Confirmar viagem
+          </button>
+        </div>
+      </div>
+    `;
+  }
 
   return `
     <div class="managed-ride-card history-ride-card" id="historyRide-${ride._id}">
@@ -215,19 +262,47 @@ function createHistoryManagedRideCard(ride) {
         </div>
 
         <div class="managed-ride-requests-panel">
-          <h4>Estado</h4>
+          <h4>Verificação</h4>
           <div class="ride-request-list">
-            <div class="ride-request-item">
-              <div class="ride-request-content">
-                <strong>Boleia concluída</strong>
-                <p class="request-status accepted">Esta viagem já aconteceu.</p>
-              </div>
-            </div>
+            ${statusHtml}
           </div>
         </div>
       </div>
     </div>
   `;
+}
+
+async function confirmRide(rideId) {
+  try {
+    let lat, lng;
+    if (navigator.geolocation) {
+      try {
+        const pos = await new Promise((resolve, reject) =>
+          navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 })
+        );
+        lat = pos.coords.latitude;
+        lng = pos.coords.longitude;
+      } catch {
+        // GPS não disponível, confirma sem localização
+      }
+    }
+
+    const result = await fetchWithAuth(`${API_BASE_RIDES}/${rideId}/confirm`, {
+      method: "POST",
+      body: JSON.stringify({ lat, lng })
+    });
+
+    if (result?.verified) {
+      alert("Viagem verificada com sucesso! Todos confirmaram.");
+    } else {
+      alert("Confirmaste a tua participação. A aguardar os restantes participantes.");
+    }
+
+    await loadRideData();
+  } catch (error) {
+    console.error("Erro ao confirmar viagem:", error);
+    alert(error.message || "Erro ao confirmar viagem.");
+  }
 }
 
 function renderRideHistory(myRides, joinedRides) {
@@ -254,6 +329,11 @@ function renderRideHistory(myRides, joinedRides) {
 
   allPast.forEach((ride) => {
     initHistoryRideMap(ride);
+
+    const card = document.getElementById(`historyRide-${ride._id}`);
+    card?.querySelectorAll(".confirm-ride-btn").forEach((btn) => {
+      btn.addEventListener("click", () => confirmRide(btn.dataset.rideId));
+    });
   });
 }
 

@@ -15,6 +15,7 @@ export default function rideRoutes(db: Db) {
   router.post("/:rideId/requests/:requestId/accept", authMiddleware, rideController.acceptRideRequest(db));
   router.post("/:rideId/requests/:requestId/reject", authMiddleware, rideController.rejectRideRequest(db));
   router.post("/:rideId/cancel", authMiddleware, rideController.cancelRideParticipation(db));
+  router.post("/:rideId/confirm", authMiddleware, rideController.confirmRide(db));
   router.delete("/:rideId", authMiddleware, rideController.deleteRide(db));
 
 

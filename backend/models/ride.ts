@@ -20,4 +20,7 @@ export interface IRide {
   };
   comment?: string;
   createdAt?: Date;
+  status?: 'scheduled' | 'completed';
+  confirmedByDriver?: boolean;
+  confirmedByPassengers?: ObjectId[];
 }

@@ -282,6 +282,79 @@ export const cancelRideParticipation = (db: Db) => async (req: Request, res: Res
   }
 };
 
+export const confirmRide = (db: Db) => async (req: Request, res: Response) => {
+  try {
+    const rideId = req.params.rideId as string;
+    const userId = (req as any).user.userId;
+    const { lat, lng } = req.body;
+
+    const rideObjectId = new ObjectId(rideId);
+    const userObjectId = new ObjectId(userId);
+
+    const ride = await db.collection("rides").findOne({ _id: rideObjectId });
+
+    if (!ride) {
+      return res.status(404).json({ error: "Boleia não encontrada" });
+    }
+
+    const now = new Date();
+    if (now < new Date(ride.arrivalTime)) {
+      return res.status(400).json({ error: "A viagem ainda não terminou" });
+    }
+
+    const isDriver = ride.driver.toString() === userId;
+    const isPassenger = ride.passengers.some((p: any) => p.toString() === userId);
+
+    if (!isDriver && !isPassenger) {
+      return res.status(403).json({ error: "Não participaste nesta boleia" });
+    }
+
+    if (isDriver) {
+      if (ride.confirmedByDriver) {
+        return res.status(400).json({ error: "Já confirmaste esta viagem" });
+      }
+      const update: any = { $set: { confirmedByDriver: true } };
+      if (lat != null && lng != null) {
+        update.$set.driverConfirmLocation = { lat: Number(lat), lng: Number(lng) };
+      }
+      await db.collection("rides").updateOne({ _id: rideObjectId }, update);
+    } else {
+      const confirmedByPassengers: any[] = ride.confirmedByPassengers || [];
+      const alreadyConfirmed = confirmedByPassengers.some((p: any) => p.toString() === userId);
+      if (alreadyConfirmed) {
+        return res.status(400).json({ error: "Já confirmaste esta viagem" });
+      }
+      const update: any = { $push: { confirmedByPassengers: userObjectId } };
+      if (lat != null && lng != null) {
+        update.$push = { confirmedByPassengers: userObjectId };
+        update.$set = { [`passengerConfirmLocations.${userId}`]: { lat: Number(lat), lng: Number(lng) } };
+      }
+      await db.collection("rides").updateOne({ _id: rideObjectId }, update);
+    }
+
+    // Check if fully verified
+    const updatedRide = await db.collection("rides").findOne({ _id: rideObjectId });
+    const confirmedPassengers: any[] = updatedRide!.confirmedByPassengers || [];
+    const allPassengersConfirmed = updatedRide!.passengers.every((p: any) =>
+      confirmedPassengers.some((c: any) => c.toString() === p.toString())
+    );
+    const fullyVerified = updatedRide!.confirmedByDriver && allPassengersConfirmed;
+
+    if (fullyVerified) {
+      await db.collection("rides").updateOne(
+        { _id: rideObjectId },
+        { $set: { status: "completed" } }
+      );
+    }
+
+    res.json({ message: "Viagem confirmada", verified: fullyVerified });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erro ao confirmar viagem" });
+  }
+};
+
 export const deleteRide = (db: Db) => async (req: Request, res: Response) => {
   try {
     const rideId = req.params.rideId as string;
