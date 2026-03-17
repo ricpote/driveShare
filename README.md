@@ -1,4 +1,4 @@
-# driveShare
+# UniRide
 
 Plataforma de partilha de boleias desenvolvida com **Node.js**, **Express**, **TypeScript** e **MongoDB**.
 Permite aos utilizadores oferecer e encontrar boleias de forma simples, com autenticação via conta Google.
